@@ -38,7 +38,7 @@ const bot = new TelegramBot(token, /*{ polling: true }*/);
 bot.on('message', async (msg) => {
 
     // Ignora se è un messaggio di posizione o msg vuoto, gestito da 'location'
-  if (msg.location || !msg.text || !userInput) {
+  if (msg.location || !msg.text ) {
     return;
   }
 
