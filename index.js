@@ -110,7 +110,7 @@ bot.on('location', async (msg) => {
                 'User-Agent': 'TiberiaBot/1.0 (un tuo contatto o sito web)'
             }
         });
-        console.log(geoData);
+        //console.log(geoData);
         const geoData = await geoResponse.json();
         
         const placeName = geoData.display_name || "una posizione specifica a Capri";
