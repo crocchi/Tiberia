@@ -95,5 +95,4 @@ app.get('/', (req, res) => {
 // Avvia il server
 app.listen(port, () => {
   console.log(`Bot Tiberia avviato e in ascolto sulla porta ${port}`);
-  console.log(`Webhook impostato su: ${webhookUrl}`);
 });
