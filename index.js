@@ -87,6 +87,77 @@ bot.on('message', async (msg) => {
   }
 });
 
+
+// Funzione helper per processare una richiesta all'assistente
+async function processAssistantRequest(chatId, inputText) {
+  await bot.sendChatAction(chatId, 'typing');
+
+  try {
+    const thread = await client.beta.threads.create();
+    await client.beta.threads.messages.create(thread.id, {
+      role: "user",
+      content: inputText,
+    });
+
+    const run = await client.beta.threads.runs.create(thread.id, {
+      assistant_id: assistantId,
+    });
+
+    let currentRun = await client.beta.threads.runs.retrieve(thread.id, run.id);
+    while (currentRun.status !== 'completed' && currentRun.status !== 'failed') {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      currentRun = await client.beta.threads.runs.retrieve(thread.id, run.id);
+    }
+
+    if (currentRun.status === 'failed') {
+      throw new Error(`La Run è fallita: ${currentRun.last_error?.message}`);
+    }
+
+    const messages = await client.beta.threads.messages.list(thread.id);
+    const assistantResponse = messages.data.find(m => m.role === 'assistant');
+
+    if (assistantResponse && assistantResponse.content[0].type === 'text') {
+      const responseText = assistantResponse.content[0].text.value;
+      await bot.sendMessage(chatId, responseText);
+      console.log(`Risposta inviata a ${chatId}.`);
+    } else {
+      await bot.sendMessage(chatId, "Spiacente, non ho ricevuto una risposta valida.");
+    }
+  } catch (error) {
+    console.error("Errore durante l'elaborazione della richiesta:", error);
+    await bot.sendMessage(chatId, "Spiacente, si è verificato un errore. Riprova più tardi.");
+  }
+};
+
+
+// --- GESTIONE POSIZIONE ---
+bot.on('location', async (msg) => {
+    const chatId = msg.chat.id;
+    const { latitude, longitude } = msg.location;
+
+    console.log(`Posizione ricevuta da ${chatId}: Lat ${latitude}, Lon ${longitude}`);
+    await bot.sendMessage(chatId, "Grazie! Sto cercando cosa c'è di interessante vicino a te...");
+
+    try {
+        // 1. Reverse Geocoding con OpenStreetMap
+        const geoResponse = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+        const geoData = await geoResponse.json();
+        
+        const placeName = geoData.display_name || "una posizione specifica a Capri";
+        console.log(`Posizione identificata come: ${placeName}`);
+
+        // 2. Crea il prompt per l'assistente
+        const prompt = `L'utente ha condiviso la sua posizione e si trova vicino a: "${placeName}". Descrivi i punti di interesse, le attività o le esperienze culturali nelle immediate vicinanze. Sii una guida turistica utile.`;
+
+        // 3. Invia il prompt all'assistente
+        await processAssistantRequest(chatId, prompt);
+
+    } catch (error) {
+        console.error("Errore durante la gestione della posizione:", error);
+        await bot.sendMessage(chatId, "Spiacente, non sono riuscito a identificare la tua posizione. Riprova.");
+    }
+});
+
 // Endpoint di base per i controlli di salute di Render
 app.get('/', (req, res) => {
   res.send('Bot Tiberia è attivo!');
