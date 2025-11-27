@@ -67,6 +67,7 @@ const result = await runner.run(
 );
 console.log(result.finalOutput);
 
+/*
 for await (const event of result) {
   // these are the raw events from the model
   if (event.type === 'raw_model_stream_event') {
@@ -81,6 +82,7 @@ for await (const event of result) {
     console.log(`${event.type} %o`, event.item);
   }
 }
+  */
 
 // Code within the code,
 // Functions calling themselves,
