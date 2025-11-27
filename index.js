@@ -3,6 +3,7 @@ import OpenAI from "openai";
 import TelegramBot from 'node-telegram-bot-api';
 import express from 'express';
 import dotenv from 'dotenv';
+import fetch from 'node-fetch';
 dotenv.config();
 
 
@@ -30,62 +31,25 @@ const bot = new TelegramBot(token, { polling: true });
 // --- FINE CONFIGURAZIONE TELEGRAM ---
 
 
+
+
+
 // --- GESTIONE MESSAGGI TELEGRAM ---
 bot.on('message', async (msg) => {
-  const chatId = msg.chat.id;
-  const userInput = msg.text;
 
-  if (!userInput) {
+    // Ignora se è un messaggio di posizione o msg vuoto, gestito da 'location'
+  if (msg.location || !msg.text || !userInput) {
     return;
   }
 
+  const chatId = msg.chat.id;
+  const userInput = msg.text;
+
   console.log(`Messaggio ricevuto da ${chatId}: "${userInput}"`);
-  await bot.sendChatAction(chatId, 'typing');
-
-  try {
-    // 1. Creare un nuovo Thread per ogni conversazione
-    const thread = await client.beta.threads.create();
-
-    // 2. Aggiungere il messaggio dell'utente al Thread
-    await client.beta.threads.messages.create(thread.id, {
-      role: "user",
-      content: userInput,
-    });
-
-    // 3. Eseguire l'Assistente sul Thread
-    const run = await client.beta.threads.runs.create(thread.id, {
-      assistant_id: assistantId,
-    });
-
-    // 4. Attendere il completamento della Run
-    let currentRun = await client.beta.threads.runs.retrieve(thread.id, run.id);
-    while (currentRun.status !== 'completed' && currentRun.status !== 'failed') {
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Attesa di 1 secondo
-      currentRun = await client.beta.threads.runs.retrieve(thread.id, run.id);
-    }
-
-    if (currentRun.status === 'failed') {
-        throw new Error(`La Run è fallita: ${currentRun.last_error?.message}`);
-    }
-
-    // 5. Recuperare i messaggi della conversazione
-    const messages = await client.beta.threads.messages.list(thread.id);
-
-    // 6. Trovare l'ultima risposta dell'assistente e inviarla
-    const assistantResponse = messages.data.find(m => m.role === 'assistant');
-    if (assistantResponse && assistantResponse.content[0].type === 'text') {
-      const responseText = assistantResponse.content[0].text.value;
-      await bot.sendMessage(chatId, responseText);
-      console.log(`Risposta inviata a ${chatId}. \n Testo: "${responseText}"`);
-    } else {
-      await bot.sendMessage(chatId, "Spiacente, non ho ricevuto una risposta valida.");
-    }
-
-  } catch (error) {
-    console.error("Errore durante l'elaborazione della richiesta:", error);
-    await bot.sendMessage(chatId, "Spiacente, si è verificato un errore. Riprova più tardi.");
-  }
+  await processAssistantRequest(chatId, userInput);
 });
+
+
 
 
 // Funzione helper per processare una richiesta all'assistente
@@ -118,6 +82,7 @@ async function processAssistantRequest(chatId, inputText) {
 
     if (assistantResponse && assistantResponse.content[0].type === 'text') {
       const responseText = assistantResponse.content[0].text.value;
+
       await bot.sendMessage(chatId, responseText);
       console.log(`Risposta inviata a ${chatId}.`);
     } else {
@@ -151,6 +116,19 @@ bot.on('location', async (msg) => {
 
         // 3. Invia il prompt all'assistente
         await processAssistantRequest(chatId, prompt);
+
+        // 4. Invia un pulsante con la mappa della posizione dell'utente
+        const mapUrl = `https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}#map=17/${latitude}/${longitude}`;
+        const options = {
+            reply_markup: {
+                inline_keyboard: [
+                    [{ text: "Apri la tua posizione sulla mappa", url: mapUrl }]
+                ]
+            }
+        };
+        await bot.sendMessage(chatId, "Ecco la tua posizione attuale:", options);
+
+
 
     } catch (error) {
         console.error("Errore durante la gestione della posizione:", error);
