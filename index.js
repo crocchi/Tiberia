@@ -105,7 +105,12 @@ bot.on('location', async (msg) => {
 
     try {
         // 1. Reverse Geocoding con OpenStreetMap
-        const geoResponse = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+        const geoResponse = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,{
+          headers: {
+                'User-Agent': 'TiberiaBot/1.0 (un tuo contatto o sito web)'
+            }
+        });
+        console.log(geoData);
         const geoData = await geoResponse.json();
         
         const placeName = geoData.display_name || "una posizione specifica a Capri";
