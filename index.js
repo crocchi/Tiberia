@@ -30,7 +30,8 @@ if (!token) {
 const bot = new TelegramBot(token, { polling: true });
 // --- FINE CONFIGURAZIONE TELEGRAM ---
 
-
+// Oggetto per memorizzare i thread degli utenti (chatId -> threadId)
+const userThreads = {};
 
 
 
@@ -57,27 +58,44 @@ async function processAssistantRequest(chatId, inputText) {
   await bot.sendChatAction(chatId, 'typing');
 
   try {
-    const thread = await client.beta.threads.create();
-    await client.beta.threads.messages.create(thread.id, {
+
+  // 1. Controlla se esiste già un thread per questo utente
+    let threadId = userThreads[chatId];
+
+    // Se non esiste, creane uno nuovo e salvalo
+    if (!threadId) {
+      const thread = await client.beta.threads.create();
+      threadId = thread.id;
+      userThreads[chatId] = threadId;
+      console.log(`Nuovo thread creato per ${chatId}: ${threadId}`);
+    } else {
+      console.log(`Riutilizzo del thread per ${chatId}: ${threadId}`);
+    }
+
+
+    // 2. Aggiungi il messaggio al thread esistente
+    await client.beta.threads.messages.create(threadId, {
       role: "user",
       content: inputText,
     });
 
-    const run = await client.beta.threads.runs.create(thread.id, {
+    // 3. Esegui l'assistente sul thread
+    const run = await client.beta.threads.runs.create(threadId, {
       assistant_id: assistantId,
     });
 
-    let currentRun = await client.beta.threads.runs.retrieve(thread.id, run.id);
+     // 4. Attendi il completamento della run
+    let currentRun = await client.beta.threads.runs.retrieve(threadId, run.id);
     while (currentRun.status !== 'completed' && currentRun.status !== 'failed') {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      currentRun = await client.beta.threads.runs.retrieve(thread.id, run.id);
+      currentRun = await client.beta.threads.runs.retrieve(threadId, run.id);
     }
 
     if (currentRun.status === 'failed') {
       throw new Error(`La Run è fallita: ${currentRun.last_error?.message}`);
     }
 
-    const messages = await client.beta.threads.messages.list(thread.id);
+    const messages = await client.beta.threads.messages.list(threadId);
     const assistantResponse = messages.data.find(m => m.role === 'assistant');
 
     if (assistantResponse && assistantResponse.content[0].type === 'text') {
