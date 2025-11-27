@@ -76,7 +76,7 @@ bot.on('message', async (msg) => {
     if (assistantResponse && assistantResponse.content[0].type === 'text') {
       const responseText = assistantResponse.content[0].text.value;
       await bot.sendMessage(chatId, responseText);
-      console.log(`Risposta inviata a ${chatId}.`);
+      console.log(`Risposta inviata a ${chatId}. \n Testo: "${responseText}"`);
     } else {
       await bot.sendMessage(chatId, "Spiacente, non ho ricevuto una risposta valida.");
     }
