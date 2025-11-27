@@ -1,0 +1,28 @@
+{
+  "name": "Tiberia",
+  "version": "0.0.1",
+  "description": "Ai guide for Capri",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "tiberia",
+    "capri",
+    "ai",
+    "tourism",
+    "travel"
+  ],
+  "author": "crocchi",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^17.2.2",
+    "socket.io": "^4.7.2",
+    "node-cron": "^4.2.1",
+    "telegraf": "^4.16.3",
+    "openai": "^4.0.0",
+    "@openai/agents": "^0.3.3"
+
+  }
+}
