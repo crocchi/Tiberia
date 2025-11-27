@@ -27,7 +27,7 @@ const token = process.env.TELEGRAM_BOT_TOKEN;
 if (!token) {
   throw new Error("Il token del bot di Telegram non è stato trovato nel file .env (TELEGRAM_BOT_TOKEN)");
 }
-const bot = new TelegramBot(token, /*{ polling: true }*/);
+const bot = new TelegramBot(token, { polling: true });
 // --- FINE CONFIGURAZIONE TELEGRAM ---
 
 
