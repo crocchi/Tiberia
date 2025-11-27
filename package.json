@@ -1,0 +1,29 @@
+{
+  "name": "tiberia",
+  "version": "1.0.0",
+  "description": "AI-powered virtual tour guide for the Island of Capri",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "scheduler": "node index.js --scheduler",
+    "test": "node --test"
+  },
+  "keywords": [
+    "capri",
+    "ai",
+    "guide",
+    "openai",
+    "tourism",
+    "chatbot"
+  ],
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "node-cron": "^4.2.1",
+    "openai": "^6.9.1"
+  }
+}
