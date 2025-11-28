@@ -39,7 +39,7 @@ const userThreads = {};
 bot.on('message', async (msg) => {
 
     // Ignora se è un messaggio di posizione o msg vuoto, gestito da 'location'
-  if (msg.location || !msg.text ) {
+  if (msg.location || !msg.text || msg.voice) {
     return;
   }
 
@@ -50,6 +50,50 @@ bot.on('message', async (msg) => {
   await processAssistantRequest(chatId, userInput);
 });
 
+// --- GESTIONE MESSAGGI VOCALI ---
+bot.on('voice', async (msg) => {
+  const chatId = msg.chat.id;
+  const fileId = msg.voice.file_id;
+  console.log(`Messaggio vocale ricevuto da ${chatId}`);
+
+  try {
+    await bot.sendMessage(chatId, "Sto ascoltando il tuo messaggio vocale...");
+    await bot.sendChatAction(chatId, 'typing');
+
+    // 1. Ottieni il link per scaricare il file
+    const fileLink = await bot.getFileLink(fileId);
+
+    // 2. Scarica il file audio
+    const response = await fetch(fileLink);
+    if (!response.ok) {
+      throw new Error(`Errore durante il download del file: ${response.statusText}`);
+    }
+    
+    // 3. Trascrivi l'audio usando OpenAI Whisper
+    // Nota: la libreria openai si aspetta un oggetto con nome file e stream
+    const transcription = await client.audio.transcriptions.create({
+        file: {
+            name: 'audio.oga', // Il nome è richiesto, anche se usiamo uno stream
+            stream: response.body,
+        },
+        model: 'whisper-1',
+    });
+
+    const transcribedText = transcription.text;
+    console.log(`Testo trascritto: "${transcribedText}"`);
+
+    // 4. Invia il testo trascritto all'assistente
+    if (transcribedText) {
+        await processAssistantRequest(chatId, transcribedText);
+    } else {
+        await bot.sendMessage(chatId, "Non sono riuscito a capire cosa hai detto. Prova a parlare più chiaramente.");
+    }
+
+  } catch (error) {
+    console.error("Errore durante la gestione del messaggio vocale:", error);
+    await bot.sendMessage(chatId, "Spiacente, si è verificato un errore durante l'elaborazione del tuo messaggio vocale.");
+  }
+});
 
 
 
