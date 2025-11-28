@@ -152,7 +152,11 @@ async function processAssistantRequest(chatId, inputText, responseType = 'text')
           input: responseText,
         });
         const audioBuffer = Buffer.from(await mp3.arrayBuffer());
-        await bot.sendVoice(chatId, audioBuffer);
+        await bot.sendVoice(chatId, audioBuffer,{}, {
+            filename: 'response.mp3',
+            contentType: 'audio/mpeg',
+        });
+        
         console.log(`Risposta audio inviata a ${chatId}.`);
       } else {
         // Invia una risposta testuale
