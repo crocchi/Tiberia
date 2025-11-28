@@ -1,5 +1,6 @@
 import express from 'express';
 import OpenAI from "openai";
+import TelegramBot from 'node-telegram-bot-api';
 
 // --- CONFIGURAZIONE EXPRESS ---
 const app = express();

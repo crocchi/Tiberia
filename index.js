@@ -1,6 +1,5 @@
 //. TIBERIA V.0.0.1
 
-import TelegramBot from 'node-telegram-bot-api';
 import { app, port, client, assistantId, bot } from './.devcontainer/config.js';
 import dotenv from 'dotenv';
 import fetch from 'node-fetch';
