@@ -57,8 +57,8 @@ bot.on('voice', async (msg) => {
   console.log(`Messaggio vocale ricevuto da ${chatId}`);
 
   try {
-    await bot.sendMessage(chatId, "Sto ascoltando il tuo messaggio vocale...");
-    await bot.sendChatAction(chatId, 'typing');
+   // await bot.sendMessage(chatId, "Sto ascoltando il tuo messaggio vocale...");
+    bot.sendChatAction(chatId, 'typing');
 
     // 1. Ottieni il link per scaricare il file
     const fileLink = await bot.getFileLink(fileId);
@@ -97,7 +97,7 @@ bot.on('voice', async (msg) => {
 
 // Funzione helper per processare una richiesta all'assistente
 async function processAssistantRequest(chatId, inputText, responseType = 'text') {
-  await bot.sendChatAction(chatId, 'typing');
+  bot.sendChatAction(chatId, 'typing');
 
   try {
 
@@ -148,7 +148,7 @@ async function processAssistantRequest(chatId, inputText, responseType = 'text')
         console.log("Generazione risposta audio...");
         const mp3 = await client.audio.speech.create({
           model: "tts-1",
-          voice: "onyx", // Puoi scegliere tra: alloy, echo, fable, onyx, nova, shale
+          voice: "sage", // Puoi scegliere tra: alloy, echo, fable, onyx, nova, shale
           input: responseText,
         });
         const audioBuffer = Buffer.from(await mp3.arrayBuffer());
@@ -156,7 +156,7 @@ async function processAssistantRequest(chatId, inputText, responseType = 'text')
             filename: 'response.mp3',
             contentType: 'audio/mpeg',
         });
-        
+
         console.log(`Risposta audio inviata a ${chatId}.`);
       } else {
         // Invia una risposta testuale
