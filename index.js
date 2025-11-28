@@ -68,15 +68,12 @@ bot.on('voice', async (msg) => {
     if (!response.ok) {
       throw new Error(`Errore durante il download del file: ${response.statusText}`);
     }
-    const audioBuffer = await response.buffer();
+    //const audioBuffer = await response.buffer();
     
     // 3. Trascrivi l'audio usando OpenAI Whisper
     // Nota: la libreria openai si aspetta un oggetto con nome file e stream
     const transcription = await client.audio.transcriptions.create({
-        file: {
-            name: 'audio.oga', // Il nome è richiesto, anche se usiamo uno stream
-            stream: audioBuffer,
-        },
+        file: response, // Passa direttamente l'oggetto 'response' di fetch
         model: 'whisper-1',
     });
 
