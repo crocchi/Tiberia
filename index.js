@@ -2,6 +2,7 @@
 
 import { app, port, client, assistantId, bot } from './.devcontainer/config.js';
 import { botOnMsg,botOnVoice,botOnLocation } from './telegram.js';
+import { startNewsUpdater } from './utility/capri-news.js';
 
 
 // --- GESTIONE EVENTI TELEGRAM ---
@@ -21,3 +22,4 @@ app.listen(port, () => {
 });
 
 //fetchFerryTime();
+startNewsUpdater()
