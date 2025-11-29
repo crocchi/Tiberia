@@ -74,28 +74,29 @@ export async function fetchFerryTime(trattaKey) {
         const text = await response.text();
         const dom = new JSDOM(text);
         
-        const orarioNodes = dom.window.document.querySelectorAll(".td.time .value");
         
-        if (orarioNodes.length === 0) {
+        // CORREZIONE: Selezioniamo prima tutte le righe della tabella dei risultati
+        const rows = dom.window.document.querySelectorAll("#table_results > tbody > tr");
+        
+        if (rows.length === 0) {
             return JSON.stringify({ tratta: trattaKey, message: "Nessun orario trovato per oggi." });
         }
 
-        const ferryInfo = Array.from(orarioNodes).map(node => {
-            const row = node.closest('tr');
+        const ferryInfo = Array.from(rows).map(row => {
+            // Ora cerchiamo le informazioni all'interno di ogni riga.
+            // Questo è molto più sicuro perché 'row' non sarà mai null.
             return {
-                orario: node.textContent.trim(),
+                orario: row.querySelector(".td.time .value")?.textContent.trim(),
                 compagnia: row.querySelector(".td.company .value .company-name")?.textContent.trim(),
                 durata: row.querySelector(".td.duration .value")?.textContent.trim(),
                 porto: row.querySelector(".td.seaport .value span")?.textContent.trim(),
                 prezzo: row.querySelector(".td.price .value")?.textContent.trim()
             };
-        });
-        
-        // 3. Salva i nuovi dati nella cache prima di restituirli
+        }).filter(info => info.orario); // Rimuoviamo eventuali righe vuote o di intestazione
+
         await saveFerryDataToCache(trattaKey, ferryInfo);
 
         return JSON.stringify(ferryInfo);
-
     } catch (error) {
         console.error("Error fetching ferry times:", error);
         return JSON.stringify({ error: "Impossibile recuperare gli orari dei traghetti." });
