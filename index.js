@@ -2,6 +2,7 @@
 
 import { app, port, client, assistantId, bot } from './.devcontainer/config.js';
 import { botOnMsg,botOnVoice,botOnLocation } from './telegram.js';
+import { fetchFerryTime } from './tools.js';
 import dotenv from 'dotenv';
 import fetch from 'node-fetch';
 dotenv.config();
@@ -22,3 +23,5 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
   console.log(`Bot Tiberia avviato e in ascolto sulla porta ${port}`);
 });
+
+fetchFerryTime();
