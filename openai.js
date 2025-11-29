@@ -68,7 +68,7 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
         // Genera e invia una risposta audio
         console.log("Generazione risposta audio...");
         const mp3 = await client.audio.speech.create({
-          model: "tts-1",
+          model: "gpt-4o-mini-tts",//"tts-1",
           voice: "nova", // Puoi scegliere tra: alloy, echo, fable, onyx, nova, shale
           input: responseText,
           instructions: "Tiberia is the ideal tour assistant and customer support professional, speaking impeccable Southern Italian accent with a persuasive yet warm tone. She reacts swiftly to any query, combining empathy and precision to instantly build trust. Her confident yet friendly approach ensures clients feel valued, making every interaction both efficient and engaging.",
