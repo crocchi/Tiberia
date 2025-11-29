@@ -2,7 +2,15 @@ import { client, bot } from './.devcontainer/config.js';
 import { processAssistantRequest } from './openai.js';
 
 
-
+const whois =(data)=>{
+    const userFirstName = data.from?.first_name || "Utente";
+    const userUsername = data.from?.username || "Sconosciuto"; // Questo è il nickname
+    const chatId = data.chat?.id || null;
+    const userInput = data.text || "";
+    const fileId = data?.voice?.file_id || null;
+    const msgInfo=`Messaggio Ricevuto da ${userFirstName} @${userUsername} ID: ${chatId}\n Contenuto: ${userInput}`;
+    return { msgInfo, userFirstName, userUsername, chatId, userInput, fileId };
+}
 // --- GESTIONE MESSAGGI TELEGRAM ---
 
 //bot.on('message', async (msg) => {
@@ -13,10 +21,9 @@ export const botOnMsg = (msg) => {
         return;
     }
 
-    const chatId = msg.chat.id;
-    const userInput = msg.text;
+    const { chatId, msgInfo, userInput } = whois(msg);
 
-    console.log(`Messaggio ricevuto da ${chatId}: "${userInput}"`);
+    console.log(msgInfo);
     processAssistantRequest(chatId, userInput, 'text');
 };
 
