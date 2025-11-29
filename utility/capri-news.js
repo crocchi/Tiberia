@@ -36,7 +36,7 @@ export async function fetchAndCacheNews() {
                 link: item.link,
                 pubDate: item.pubDate,
                 // Crea uno snippet più lungo e pulito dal contenuto completo
-                snippet: fullContent.substring(0, 250) + '...'
+                snippet: fullContent//.substring(0, 250) + '...'
             };
         });
         await fs.mkdir(CACHE_DIR, { recursive: true });
