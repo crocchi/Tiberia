@@ -1,11 +1,7 @@
-//. TIBERIA V.0.0.1
+//. TIBERIA V.0.0.2
 
 import { app, port, client, assistantId, bot } from './.devcontainer/config.js';
 import { botOnMsg,botOnVoice,botOnLocation } from './telegram.js';
-import { fetchFerryTime } from './tools.js';
-import dotenv from 'dotenv';
-import fetch from 'node-fetch';
-dotenv.config();
 
 
 // --- GESTIONE EVENTI TELEGRAM ---

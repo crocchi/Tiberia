@@ -13,7 +13,9 @@ const tratteMap = {
     "capri-sorrento": "capri/sorrento",
     "sorrento-capri": "sorrento/capri",
     "capri-ischia": "capri/ischia",
-    "ischia-capri": "ischia/capri"
+    "ischia-capri": "ischia/capri",
+    "capri-positano": "capri/positano",
+    "positano-capri": "positano/capri"
 };
 
 async function getFerryDataFromCache(trattaKey) {
