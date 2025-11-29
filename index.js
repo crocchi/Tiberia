@@ -1,16 +1,21 @@
 //. TIBERIA V.0.0.1
 
 import { app, port, client, assistantId, bot } from './.devcontainer/config.js';
+import { botOnMsg,botOnVoice,botOnLocation } from './telegram.js';
 import dotenv from 'dotenv';
 import fetch from 'node-fetch';
 dotenv.config();
 
 
+// --- GESTIONE EVENTI TELEGRAM ---
+bot.on('message', botOnMsg);
+bot.on('voice', botOnVoice);
+bot.on('location', botOnLocation);
 
 
 // Endpoint di base per i controlli di salute di Render
 app.get('/', (req, res) => {
-  res.send('Bot Tiberia è attivo!');
+  res.send('<h2>Bot Tiberia è attivo!</h2>');
 });
 
 // Avvia il server
