@@ -76,7 +76,8 @@ export async function fetchFerryTime(trattaKey) {
         
         
         // CORREZIONE: Selezioniamo prima tutte le righe della tabella dei risultati
-        const rows = dom.window.document.querySelectorAll("#table_results > tbody > tr");
+        const rows = dom.window.document.querySelectorAll(".tbody > .tr");
+        
         
         if (rows.length === 0) {
             return JSON.stringify({ tratta: trattaKey, message: "Nessun orario trovato per oggi." });
@@ -85,7 +86,7 @@ export async function fetchFerryTime(trattaKey) {
         const ferryInfo = Array.from(rows).map(row => {
             // Ora cerchiamo le informazioni all'interno di ogni riga.
             // Questo è molto più sicuro perché 'row' non sarà mai null.
-            return {
+            return {//a[0].querySelector(".td.time .value")?.textContent.trim()
                 orario: row.querySelector(".td.time .value")?.textContent.trim(),
                 compagnia: row.querySelector(".td.company .value .company-name")?.textContent.trim(),
                 durata: row.querySelector(".td.duration .value")?.textContent.trim(),
