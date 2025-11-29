@@ -1,5 +1,6 @@
 
 import { client, assistantId, bot, vectorStoreId } from './.devcontainer/config.js';
+import { fetchFerryTime } from './tools.js';
 
 // Set per tenere traccia degli utenti che hanno una richiesta in corso
 export const busyUsers = new Set();
