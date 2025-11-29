@@ -45,7 +45,7 @@ export async function fetchFerryTime() {
 
         if (orario.length > 0) {
             orario.forEach((element, index) => {
-                console.log(element.textContent.trim());
+                //console.log(element.textContent.trim());
                 ferryInfo.push({
                     tratta,
                     orario: element.textContent.trim(),
