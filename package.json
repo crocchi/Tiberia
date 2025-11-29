@@ -21,8 +21,7 @@
     "express": "5.1.0",
     "node-telegram-bot-api": "^0.61.0",
     "openai": "^4.0.0",
-    "@openai/agents": "^0.3.3",
-    "zod": "^3.25.40"
+    "jsdom": "24.1.0"
 
   }
 }
