@@ -66,9 +66,9 @@ export async function fetchFerryTime(trattaKey) {
     }
 
     // 2. Se la cache è vuota o scaduta, fai la richiesta web
-    console.log(`Fetching dati live da web per ${trattaKey}...`);
+    
     const url = `https://www.naplesbayferry.com/it/t/${path}`;
-
+    console.log(`Fetching dati live da web per ${trattaKey}...\nURL: ${url}`);
     try {
         const response = await fetch(url);
         const text = await response.text();
@@ -96,6 +96,8 @@ export async function fetchFerryTime(trattaKey) {
 
         await saveFerryDataToCache(trattaKey, ferryInfo);
 
+        console.log(`Dati live recuperati e cache aggiornata per ${trattaKey}.`);
+        console.log(ferryInfo);
         return JSON.stringify(ferryInfo);
     } catch (error) {
         console.error("Error fetching ferry times:", error);
