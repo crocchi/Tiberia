@@ -5,6 +5,7 @@ import Parser from 'rss-parser';
 import fs from 'fs/promises';
 import path from 'path';
 import cron from 'node-cron'; // 1. Importa node-cron
+import { JSDOM } from 'jsdom'; 
 
 const FEED_URL = 'https://www.capripost.it/feed/';
 const CACHE_DIR = path.join(process.cwd(), 'cache');
@@ -25,13 +26,19 @@ export async function fetchAndCacheNews() {
             return;
         }
 
-        const newsItems = feed.items.slice(0, 20).map(item => ({
-            title: item.title,
-            link: item.link,
-            pubDate: item.pubDate,
-            snippet: item.contentSnippet?.substring(0, 150) + '...'
-        }));
-
+        // 2. Mappa le notizie usando il contenuto pulito
+        const newsItems = feed.items.slice(0, 20).map(item => {
+            // Usa il campo 'content:encoded' che è più ricco, e puliscilo dall'HTML
+            const fullContent = getTextFromHtml(item['content:encoded'] || item.content);
+            
+            return {
+                title: item.title,
+                link: item.link,
+                pubDate: item.pubDate,
+                // Crea uno snippet più lungo e pulito dal contenuto completo
+                snippet: fullContent.substring(0, 250) + '...'
+            };
+        });
         await fs.mkdir(CACHE_DIR, { recursive: true });
         await fs.writeFile(NEWS_CACHE_FILE, JSON.stringify(newsItems, null, 2));
 
@@ -61,4 +68,13 @@ export function startNewsUpdater() {
     });
 
     console.log('Task di aggiornamento notizie programmato per le 04:00 ogni giorno.');
+}
+
+function getTextFromHtml(htmlString) {
+    if (!htmlString) return '';
+    const dom = new JSDOM(htmlString);
+    // Rimuovi script e stili per non includerli nel testo
+    dom.window.document.querySelectorAll('script, style').forEach(el => el.remove());
+    // Restituisci il testo del body, pulito da spazi extra e a capo
+    return dom.window.document.body.textContent.replace(/\s\s+/g, ' ').trim();
 }
