@@ -20,12 +20,66 @@ import {JSDOM } from 'jsdom';
 
 //https://www.facebook.com/InfoCollegamentiMarittimiEMeteo
 
-
+// Mappatura per costruire gli URL corretti
+const tratteMap = {
+    "capri-napoli": "capri/napoli",
+    "napoli-capri": "napoli/capri",
+    "capri-sorrento": "capri/sorrento",
+    "sorrento-capri": "sorrento/capri",
+    "capri-ischia": "capri/ischia",
+    "ischia-capri": "ischia/capri"
+};
 //navi capri napoli
 //let el=document.querySelectorAll(".td.time .value")
 //el[0].textContent
+
+
+
+export async function fetchFerryTime(trattaKey) {
+    const path = tratteMap[trattaKey];
+    if (!path) {
+        return JSON.stringify({ error: "Tratta non valida. Usa una delle seguenti: " + Object.keys(tratteMap).join(', ') });
+    }
+
+    const url = `https://www.naplesbayferry.com/it/t/${path}`;
+    console.log(`Fetching data from: ${url}`);
+
+    try {
+        const response = await fetch(url);
+        const text = await response.text();
+        const dom = new JSDOM(text);
+        
+        const tratta = dom.window.document.querySelector(".hgroup > h2")?.textContent.trim();
+        const orarioNodes = dom.window.document.querySelectorAll(".td.time .value");
+        
+        if (orarioNodes.length === 0) {
+            return JSON.stringify({ tratta, message: "Nessun orario trovato per oggi." });
+        }
+
+        const ferryInfo = Array.from(orarioNodes).map((node, index) => {
+            const row = node.closest('tr'); // Trova la riga genitore per cercare solo al suo interno
+            return {
+                orario: node.textContent.trim(),
+                compagnia: row.querySelector(".td.company .value .company-name")?.textContent.trim(),
+                durata: row.querySelector(".td.duration .value")?.textContent.trim(),
+                porto: row.querySelector(".td.seaport .value span")?.textContent.trim(),
+                prezzo: row.querySelector(".td.price .value")?.textContent.trim()
+            };
+        });
+        
+        // Restituiamo una stringa JSON, che è il formato migliore per l'AI
+        return JSON.stringify(ferryInfo);
+
+    } catch (error) {
+        console.error("Error fetching ferry times:", error);
+        return JSON.stringify({ error: "Impossibile recuperare gli orari dei traghetti." });
+    }
+}
+
+
+
 const tratte =["capri/napoli" , "napoli/capri" , "capri/sorrento" , "capri/ischia" ];
-export async function fetchFerryTime() {
+export async function fetchFerryTimee() {
     try {
         const response = await fetch('https://www.naplesbayferry.com/it/t/capri/napoli');
         const text = await response.text();
@@ -71,3 +125,35 @@ export async function fetchFerryTime() {
 //https://www.naplesbayferry.com/it/ferry-booking?from=capri&to=sorrento&
 // ferry_group=capri&one_way_date=29%2F11%2F2025&radio_way_type=on
 
+/*
+
+function calling example:
+{
+  "name": "getFerryTimes",
+  "description": "Recupera gli orari dei traghetti in tempo reale per una specifica tratta. Usalo ogni volta che un utente chiede informazioni su navi, aliscafi o traghetti.",
+  "strict": true,
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "location": {
+        "type": "string",
+        "description": "The city and state e.g. San Francisco, CA"
+      },
+      "unit": {
+        "type": "string",
+        "enum": [
+          "c",
+          "f"
+        ]
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "location",
+      "unit"
+    ]
+  }
+}
+
+
+*/

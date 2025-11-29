@@ -6,6 +6,9 @@ export const busyUsers = new Set();
 // Oggetto per memorizzare i thread degli utenti (chatId -> threadId)
 export const userThreads = {};
 
+
+
+
 // Funzione helper per processare una richiesta all'assistente
 export async function processAssistantRequest(chatId, inputText, responseType = 'text') {
   
@@ -50,56 +53,83 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
     });
 
     // 3. Esegui l'assistente sul thread
-    const run = await client.beta.threads.runs.create(threadId, {
+    let run = await client.beta.threads.runs.create(threadId, {
       assistant_id: assistantId,
     });
 
-    // 4. Attendi il completamento della run
-    let currentRun = await client.beta.threads.runs.retrieve(threadId, run.id);
-    while (currentRun.status !== 'completed' && currentRun.status !== 'failed') {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      currentRun = await client.beta.threads.runs.retrieve(threadId, run.id);
-    }
+    // CICLO DI GESTIONE RUN
+        while (['queued', 'in_progress', 'cancelling'].includes(run.status)) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            run = await client.beta.threads.runs.retrieve(threadId, run.id);
+        }
 
-    if (currentRun.status === 'failed') {
-      throw new Error(`La Run è fallita: ${currentRun.last_error?.message}`);
-    }
+ // GESTISCI LA RICHIESTA DI ESEGUIRE UN TOOL
+        if (run.status === 'requires_action') {
+            const toolCalls = run.required_action.submit_tool_outputs.tool_calls;
+            const toolOutputs = [];
 
-    const messages = await client.beta.threads.messages.list(threadId);
-    const assistantResponse = messages.data.find(m => m.role === 'assistant');
+            for (const toolCall of toolCalls) {
+                const functionName = toolCall.function.name;
+                const args = JSON.parse(toolCall.function.arguments);
 
-    if (assistantResponse && assistantResponse.content[0].type === 'text') {
-      const responseText = assistantResponse.content[0].text.value;
+                if (functionName === 'getFerryTimes') {
+                    console.log(`Esecuzione tool 'getFerryTimes' con argomenti:`, args);
+                    const output = await fetchFerryTime(args.trattaKey);
+                    toolOutputs.push({
+                        tool_call_id: toolCall.id,
+                        output: output,
+                    });
+                }
+            }
 
-      if (responseType === 'voice') {
-        // Genera e invia una risposta audio
-        console.log("Generazione risposta audio...");
+            // Invia i risultati del tool all'assistente
+            run = await client.beta.threads.runs.submitToolOutputs(threadId, run.id, {
+                tool_outputs: toolOutputs,
+            });
+            // Continua ad attendere il completamento
+            while (['queued', 'in_progress', 'cancelling'].includes(run.status)) {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                run = await client.beta.threads.runs.retrieve(threadId, run.id);
+            }
+        }
+
+        let messages,assistantResponse;
+    // Se la run è completata, estrai la risposta finale
+         if (run.status === 'completed') {
+      const messages = await client.beta.threads.messages.list(threadId);
+      const assistantResponse = messages.data.find(m => m.role === 'assistant');
+
+      if (assistantResponse && assistantResponse.content[0].type === 'text') {
+        const responseText = assistantResponse.content[0].text.value;
+
+        if (responseType === 'voice') {
+       console.log("Generazione risposta audio...");
         const mp3 = await client.audio.speech.create({
           model: "gpt-4o-mini-tts",//"tts-1",
           voice: "nova", // Puoi scegliere tra: alloy, echo, fable, onyx, nova, shale
           input: responseText,
-          instructions: "Tiberia is the ideal tour assistant and customer support professional, speaking impeccable Southern Italian accent with a persuasive yet warm tone. She reacts swiftly to any query, combining empathy and precision to instantly build trust. Her confident yet friendly approach ensures clients feel valued, making every interaction both efficient and engaging.",
+         // instructions: "Tiberia is the ideal tour assistant and customer support professional, speaking impeccable Southern Italian accent with a persuasive yet warm tone. She reacts swiftly to any query, combining empathy and precision to instantly build trust. Her confident yet friendly approach ensures clients feel valued, making every interaction both efficient and engaging.",
         });
-        const audioBuffer = Buffer.from(await mp3.arrayBuffer());
-        await bot.sendVoice(chatId, audioBuffer,{}, {
+          const audioBuffer = Buffer.from(await mp3.arrayBuffer());
+          await bot.sendVoice(chatId, audioBuffer, {}, {
             filename: 'response.mp3',
             contentType: 'audio/mpeg',
-        });
-
-        console.log(`Risposta audio inviata a ${chatId}.`);
+          });
+          console.log(`Risposta audio inviata a ${chatId}.`);
+        } else {
+          await bot.sendMessage(chatId, responseText);
+          console.log(`Risposta testuale inviata a ${chatId}.`);
+        }
       } else {
-        // Invia una risposta testuale
-        await bot.sendMessage(chatId, responseText);
-        console.log(`Risposta testuale inviata a ${chatId}.`);
+        await bot.sendMessage(chatId, "Spiacente, non ho ricevuto una risposta valida.");
       }
     } else {
-      await bot.sendMessage(chatId, "Spiacente, non ho ricevuto una risposta valida.");
+      throw new Error(`La Run è fallita con stato: ${run.status}`);
     }
   } catch (error) {
     console.error("Errore durante l'elaborazione della richiesta:", error);
     await bot.sendMessage(chatId, "Spiacente, si è verificato un errore. Riprova più tardi.");
-  } finally{
-    // 3.Sblocca l'utente
+  } finally {
     busyUsers.delete(chatId);
   }
 };
