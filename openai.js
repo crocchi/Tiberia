@@ -1,5 +1,5 @@
 
-import { client, bot } from './.devcontainer/config.js';
+import { client, assistantId, bot } from './.devcontainer/config.js';
 
 // Set per tenere traccia degli utenti che hanno una richiesta in corso
 export const busyUsers = new Set();
