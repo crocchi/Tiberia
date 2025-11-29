@@ -69,7 +69,7 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
         console.log("Generazione risposta audio...");
         const mp3 = await client.audio.speech.create({
           model: "tts-1",
-          voice: "sage", // Puoi scegliere tra: alloy, echo, fable, onyx, nova, shale
+          voice: "nova", // Puoi scegliere tra: alloy, echo, fable, onyx, nova, shale
           input: responseText,
         });
         const audioBuffer = Buffer.from(await mp3.arrayBuffer());

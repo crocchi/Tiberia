@@ -24,6 +24,7 @@ import {JSDOM } from 'jsdom';
 //navi capri napoli
 //let el=document.querySelectorAll(".td.time .value")
 //el[0].textContent
+const tratte =["capri/napoli" , "napoli/capri" , "capri/sorrento" , "capri/ischia" ];
 export async function fetchFerryTime() {
     try {
         const response = await fetch('https://www.naplesbayferry.com/it/t/capri/napoli');
@@ -66,4 +67,7 @@ export async function fetchFerryTime() {
     }
 }
 
+//booking 
+//https://www.naplesbayferry.com/it/ferry-booking?from=capri&to=sorrento&
+// ferry_group=capri&one_way_date=29%2F11%2F2025&radio_way_type=on
 
