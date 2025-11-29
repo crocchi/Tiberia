@@ -16,6 +16,7 @@ const assistantId = process.env.ASSISTANT_ID;
 if (!assistantId) {
   throw new Error("L'ID dell'assistente non è stato trovato nel file .env (ASSISTANT_ID)");
 }
+const vectorStoreId = process.env.VECTOR_STORE_ID; 
 
 // --- CONFIGURAZIONE TELEGRAM ---
 const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -27,4 +28,4 @@ if (!token) {
 const bot = new TelegramBot(token, { polling: true });
 // --- FINE CONFIGURAZIONE TELEGRAM ---
 
-export { app, port, client, assistantId, bot };
+export { app, port, client, assistantId, bot , vectorStoreId};

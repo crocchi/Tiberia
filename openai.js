@@ -1,5 +1,5 @@
 
-import { client, assistantId, bot } from './.devcontainer/config.js';
+import { client, assistantId, bot, vectorStoreId } from './.devcontainer/config.js';
 
 // Set per tenere traccia degli utenti che hanno una richiesta in corso
 export const busyUsers = new Set();
@@ -27,7 +27,14 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
 
     // Se non esiste, creane uno nuovo e salvalo
     if (!threadId) {
-      const thread = await client.beta.threads.create();
+      //const thread = await client.beta.threads.create();
+      const thread = await client.beta.threads.create({
+        tool_resources: {
+          file_search: {
+            vector_store_ids: [vectorStoreId]
+          }
+        }
+      });
       threadId = thread.id;
       userThreads[chatId] = threadId;
       console.log(`Nuovo thread creato per ${chatId}: ${threadId}`);
