@@ -24,4 +24,4 @@ app.listen(port, () => {
   console.log(`Bot Tiberia avviato e in ascolto sulla porta ${port}`);
 });
 
-fetchFerryTime();
+//fetchFerryTime();
