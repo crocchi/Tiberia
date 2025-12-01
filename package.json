@@ -24,7 +24,7 @@
     "jsdom": "24.1.0",
     "rss-parser": "3.13.0",
     "node-cron": "^4.2.1",
-    "pinecone-client": "^2.0.0"
+    "@pinecone-database/pinecone": "^6.1.3"
 
   }
 }
