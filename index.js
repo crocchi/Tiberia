@@ -33,14 +33,14 @@ function startEventsUpdater() {
     console.log('Avvio del servizio di aggiornamento eventi di Capri.');
     
     // Esegui subito all'avvio
-    fetchAndIndexEvents();
+    //fetchAndIndexEvents();
 
     // Esegui subito all'avvio
-    fetchAndCacheNews();
+    //fetchAndCacheNews();
 
     // Programma l'esecuzione ogni ora per catturare nuovi eventi durante il giorno
-    cron.schedule('0 2 * * *', () => {
-        console.log('Esecuzione del task orario per gli eventi.ore 02:00');
+    cron.schedule('30 23 * * *', () => {
+        console.log('Esecuzione del task orario per gli eventi.ore 23:30');
         fetchAndIndexEvents();
     }, {
         scheduled: true,
@@ -50,4 +50,4 @@ function startEventsUpdater() {
     console.log('Task di aggiornamento eventi programmato ogni ora.');
 }
 
-fetchAndIndexEvents();
+startEventsUpdater()

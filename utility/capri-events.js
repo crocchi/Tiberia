@@ -26,21 +26,47 @@ function getTextFromHtml(htmlString) {
     return dom.window.document.body.textContent.replace(/\s\s+/g, ' ').trim();
 }
 
+/**
+ * Genera le date di inizio e fine per la giornata odierna nel fuso orario di Roma.
+ * @returns {{startOfDay: string, endOfDay: string}} Le date in formato ISO 8601.
+
+tartOfDay: '2025-11-30T23:00:00.000Z', endOfDay: '2025-12-01T23:00:00.000Z'}
+*/
+function getTodayDateRange() {
+    const now = new Date();
+    
+    // Imposta l'inizio del giorno (mezzanotte) a Roma
+    const startOfDay = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Rome" }));
+    startOfDay.setHours(0, 0, 0, 0);
+
+    // Imposta la fine del giorno (mezzanotte del giorno dopo)
+    const endOfDay = new Date(startOfDay);
+    endOfDay.setDate(endOfDay.getDate() + 1);
+
+    return {
+        startOfDay: startOfDay.toISOString(),
+        endOfDay: endOfDay.toISOString()
+    };
+}
+
 let categories=6;//eventi
 /*
 7=SPORT
 6=EVENTI
 */
-let url=`https://www.capripost.it/wp-json/wp/v2/posts?categories=${categories}&after=${getDateToUpdate()}`;
-url=`https://www.capripost.it/wp-json/wp/v2/posts?categories=${categories}&after=2025-11-25T00:00:00`;
+//url=`https://www.capripost.it/wp-json/wp/v2/posts?categories=${categories}&after=2025-11-25T00:00:00`;
 
 /**https://www.capripost.it/wp-json/wp/v2/posts?categories=7&after=2025-11-30T00:00:00
  * Scarica gli eventi del giorno, li processa e li salva su Pinecone.
  */
 export async function fetchAndIndexEvents() {
     console.log('Esecuzione task: aggiornamento eventi di Capri...');
-    
-    
+
+    const { startOfDay, endOfDay } = getTodayDateRange();
+    console.log(`Intervallo di date per il fetch: da ${startOfDay} a ${endOfDay}`);
+
+    let url=`https://www.capripost.it/wp-json/wp/v2/posts?categories=${categories}&after=${startOfDay}&before=${endOfDay}`;
+
     // Costruisci l'URL per ottenere i post di oggi nella categoria "Eventi"
     //const url = `${API_BASE_URL}?categories=${EVENTS_CATEGORY_ID}&after=${startOfDay}&before=${endOfDay}&per_page=100`;
     
