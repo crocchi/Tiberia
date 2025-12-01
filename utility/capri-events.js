@@ -26,7 +26,11 @@ function getTextFromHtml(htmlString) {
     return dom.window.document.body.textContent.replace(/\s\s+/g, ' ').trim();
 }
 
-let categories=7;//eventi
+let categories=6;//eventi
+/*
+7=SPORT
+6=EVENTI
+*/
 let url=`https://www.capripost.it/wp-json/wp/v2/posts?categories=${categories}&after=${getDateToUpdate()}`;
 url=`https://www.capripost.it/wp-json/wp/v2/posts?categories=${categories}&after=2025-11-25T00:00:00`;
 
