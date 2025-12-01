@@ -21,6 +21,7 @@ const getDateToUpdate = ()=>{
 
 let categories=7;//eventi
 let url=`https://www.capripost.it/wp-json/wp/v2/posts?categories=${categories}&after=${getDateToUpdate()}`;
+url=`https://www.capripost.it/wp-json/wp/v2/posts?categories=${categories}&after=2025-11-27T00:00:00`;
 
 /**https://www.capripost.it/wp-json/wp/v2/posts?categories=7&after=2025-11-30T00:00:00
  * Scarica gli eventi del giorno, li processa e li salva su Pinecone.
