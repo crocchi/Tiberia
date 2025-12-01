@@ -1,6 +1,7 @@
 
 import { client, assistantId, bot, vectorStoreId } from './.devcontainer/config.js';
 import { fetchFerryTime } from './utility/fetchFerry.js';
+import { findSimilarItems } from './DB/pineconeDBsearch.js';
 
 // Set per tenere traccia degli utenti che hanno una richiesta in corso
 export const busyUsers = new Set();
@@ -12,15 +13,15 @@ export const userThreads = {};
 
 // Funzione helper per processare una richiesta all'assistente
 export async function processAssistantRequest(chatId, inputText, responseType = 'text') {
-  
-   // 1. Controlla se l'utente è già "occupato"
+
+  // 1. Controlla se l'utente è già "occupato"
   if (busyUsers.has(chatId)) {
     console.log(`Richiesta in attesa per ${chatId} perché una è già in corso.`);
-    while(busyUsers.has(chatId)) {
+    while (busyUsers.has(chatId)) {
       await new Promise(resolve => setTimeout(resolve, 800));
     }
   }
-   // 2. Blocca l'utente
+  // 2. Blocca l'utente
   busyUsers.add(chatId);
   bot.sendChatAction(chatId, 'typing');
 
@@ -59,44 +60,54 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
     });
 
     // CICLO DI GESTIONE RUN
-        while (['queued', 'in_progress', 'cancelling'].includes(run.status)) {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            run = await client.beta.threads.runs.retrieve(threadId, run.id);
+    while (['queued', 'in_progress', 'cancelling'].includes(run.status)) {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      run = await client.beta.threads.runs.retrieve(threadId, run.id);
+    }
+
+    // GESTISCI LA RICHIESTA DI ESEGUIRE UN TOOL
+    if (run.status === 'requires_action') {
+      const toolCalls = run.required_action.submit_tool_outputs.tool_calls;
+      const toolOutputs = [];
+
+      for (const toolCall of toolCalls) {
+        const functionName = toolCall.function.name;
+        const args = JSON.parse(toolCall.function.arguments);
+        let output;
+
+        if (functionName === 'getFerryTimes') {
+          console.log(`Esecuzione tool 'getFerryTimes' con argomenti:`, args);
+          output = await fetchFerryTime(args.trattaKey);
+        } else if (functionName === 'searchNewsAndEvents') {
+          console.log(`Esecuzione tool 'searchNewsAndEvents' con argomenti:`, args);
+          const searchResults = await findSimilarItems(args.queryText, 3); // Cerca i 3 risultati migliori
+          // L'assistente si aspetta una stringa, quindi convertiamo l'array di risultati in JSON
+          output = JSON.stringify(searchResults);
         }
 
- // GESTISCI LA RICHIESTA DI ESEGUIRE UN TOOL
-        if (run.status === 'requires_action') {
-            const toolCalls = run.required_action.submit_tool_outputs.tool_calls;
-            const toolOutputs = [];
-
-            for (const toolCall of toolCalls) {
-                const functionName = toolCall.function.name;
-                const args = JSON.parse(toolCall.function.arguments);
-
-                if (functionName === 'getFerryTimes') {
-                    console.log(`Esecuzione tool 'getFerryTimes' con argomenti:`, args);
-                    const output = await fetchFerryTime(args.trattaKey);
-                    toolOutputs.push({
-                        tool_call_id: toolCall.id,
-                        output: output,
-                    });
-                }
-            }
-
-            // Invia i risultati del tool all'assistente
-            run = await client.beta.threads.runs.submitToolOutputs(threadId, run.id, {
-                tool_outputs: toolOutputs,
+        if (output) {
+            toolOutputs.push({
+                tool_call_id: toolCall.id,
+                output: output,
             });
-            // Continua ad attendere il completamento
-            while (['queued', 'in_progress', 'cancelling'].includes(run.status)) {
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                run = await client.beta.threads.runs.retrieve(threadId, run.id);
-            }
         }
 
-        let messages,assistantResponse;
+      }
+
+      // Invia i risultati del tool all'assistente
+      run = await client.beta.threads.runs.submitToolOutputs(threadId, run.id, {
+        tool_outputs: toolOutputs,
+      });
+      // Continua ad attendere il completamento
+      while (['queued', 'in_progress', 'cancelling'].includes(run.status)) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        run = await client.beta.threads.runs.retrieve(threadId, run.id);
+      }
+    }
+
+   
     // Se la run è completata, estrai la risposta finale
-         if (run.status === 'completed') {
+    if (run.status === 'completed') {
       const messages = await client.beta.threads.messages.list(threadId);
       const assistantResponse = messages.data.find(m => m.role === 'assistant');
 
@@ -104,13 +115,13 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
         const responseText = assistantResponse.content[0].text.value;
 
         if (responseType === 'voice') {
-       console.log("Generazione risposta audio...");
-        const mp3 = await client.audio.speech.create({
-          model: "gpt-4o-mini-tts",//"tts-1",
-          voice: "nova", // Puoi scegliere tra: alloy, echo, fable, onyx, nova, shale
-          input: responseText,
-         // instructions: "Tiberia is the ideal tour assistant and customer support professional, speaking impeccable Southern Italian accent with a persuasive yet warm tone. She reacts swiftly to any query, combining empathy and precision to instantly build trust. Her confident yet friendly approach ensures clients feel valued, making every interaction both efficient and engaging.",
-        });
+          console.log("Generazione risposta audio...");
+          const mp3 = await client.audio.speech.create({
+            model: "gpt-4o-mini-tts",//"tts-1",
+            voice: "nova", // Puoi scegliere tra: alloy, echo, fable, onyx, nova, shale
+            input: responseText,
+            // instructions: "Tiberia is the ideal tour assistant and customer support professional, speaking impeccable Southern Italian accent with a persuasive yet warm tone. She reacts swiftly to any query, combining empathy and precision to instantly build trust. Her confident yet friendly approach ensures clients feel valued, making every interaction both efficient and engaging.",
+          });
           const audioBuffer = Buffer.from(await mp3.arrayBuffer());
           await bot.sendVoice(chatId, audioBuffer, {}, {
             filename: 'response.mp3',
