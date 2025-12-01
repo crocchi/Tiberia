@@ -1,10 +1,11 @@
 //. TIBERIA V.0.0.3
 
-import { app, port, client, assistantId, bot } from './.devcontainer/config.js';
+import { app, port, client, assistantId, bot,INDEX_DB_NEWS, INDEX_DB_EVENTS } from './.devcontainer/config.js';
 import { botOnMsg,botOnVoice,botOnLocation } from './telegram.js';
 import { fetchAndCacheNews } from './utility/capri-news.js';
 import cron from 'node-cron';
 import { fetchAndIndexEvents } from './utility/capri-events.js';
+
 
 
 // --- GESTIONE EVENTI TELEGRAM ---
@@ -38,8 +39,8 @@ function startEventsUpdater() {
     // Programma l'esecuzione ogni ora per catturare nuovi eventi durante il giorno
     cron.schedule('30 23 * * *', () => {
         console.log('Esecuzione del task orario per gli eventi.ore 23:30');
-        fetchAndIndexEvents([6],'tiberia-news'); //fetchano eventi del giorno
-        fetchAndIndexEvents([3,4,7],'newscapri'); //fetchano newsgenerali
+        fetchAndIndexEvents([6], INDEX_DB_EVENTS); //fetchano eventi del giorno
+        fetchAndIndexEvents([3,4,7], INDEX_DB_NEWS); //fetchano newsgenerali
     }, {
         scheduled: true,
         timezone: "Europe/Rome"

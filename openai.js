@@ -3,6 +3,7 @@ import { client, assistantId, bot, vectorStoreId } from './.devcontainer/config.
 import { fetchFerryTime } from './utility/fetchFerry.js';
 import { findSimilarItems } from './DB/pineconeDBsearch.js';
 import { getDateTime } from './utility/time.js';
+import {INDEX_DB_EVENTS, INDEX_DB_NEWS} from './.devcontainer/config.js';
 
 // Set per tenere traccia degli utenti che hanno una richiesta in corso
 export const busyUsers = new Set();
@@ -13,7 +14,7 @@ export const userThreads = {};
 // Funzione helper per processare una richiesta all'assistente
 export async function processAssistantRequest(chatId, inputText, responseType = 'text') {
 
-  inputText=`[${getDateTime()}] ${inputText}`
+  inputText = `[${getDateTime()}] ${inputText}`
   // 1. Controlla se l'utente è già "occupato"
   if (busyUsers.has(chatId)) {
     console.log(`Richiesta in attesa per ${chatId} perché una è già in corso.`);
@@ -78,18 +79,23 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
         if (functionName === 'getFerryTimes') {
           console.log(`Esecuzione tool 'getFerryTimes' con argomenti:`, args);
           output = await fetchFerryTime(args.trattaKey);
-        } else if (functionName === 'searchNewsAndEvents') {
-          console.log(`Esecuzione tool 'searchNewsAndEvents' con argomenti:`, args);
-          const searchResults = await findSimilarItems(args.queryText, 3); // Cerca i 3 risultati migliori
+
+        } else if (functionName === 'searchNews') {
+          console.log(`Esecuzione tool 'searchNews' con argomenti:`, args);
+          const searchResults = await findSimilarItems(args.queryText, 3, INDEX_DB_NEWS); // Cerca i 3 risultati migliori
           // L'assistente si aspetta una stringa, quindi convertiamo l'array di risultati in JSON
+          output = JSON.stringify(searchResults);
+        } else if (functionName === 'searchEvent') {
+          // Cerca negli eventi (indice Pinecone: 'tiberia-events')
+          const searchResults = await findSimilarItems(args.queryText, 3, INDEX_DB_EVENTS);
           output = JSON.stringify(searchResults);
         }
 
         if (output) {
-            toolOutputs.push({
-                tool_call_id: toolCall.id,
-                output: output,
-            });
+          toolOutputs.push({
+            tool_call_id: toolCall.id,
+            output: output,
+          });
         }
 
       }
@@ -105,7 +111,7 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
       }
     }
 
-   
+
     // Se la run è completata, estrai la risposta finale
     if (run.status === 'completed') {
       const messages = await client.beta.threads.messages.list(threadId);

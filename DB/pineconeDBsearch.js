@@ -1,6 +1,7 @@
 //import { Pinecone } from '@pinecone-database/pinecone';
 import { generateEmbedding } from '../utility/embeddings.js';
 import { getPineconeIndex } from './pineconeDB.js';
+import { INDEX_DB_NEWS, INDEX_DB_EVENTS } from '../.devcontainer/config.js';
 
 
 
@@ -13,11 +14,11 @@ import { getPineconeIndex } from './pineconeDB.js';
  * @param {number} topN Il numero di risultati più pertinenti da restituire.
  * @returns {Promise<Array<Object>>} Un array di oggetti risultato.
  */
-export async function findSimilarItems(queryText, topN = 3) {
-    console.log(`Ricerca su Pinecone per: "${queryText}"`);
+export async function findSimilarItems(queryText, topN = 3, indexDBName = INDEX_DB_EVENTS) {
+    console.log(`Ricerca su Pinecone per: "${queryText}" nell'indice "${indexDBName}"`);
 
     try {
-        const index = await getPineconeIndex();
+        const index = await getPineconeIndex(indexDBName);
 
         // 1. Genera l'embedding per la query
         const queryEmbedding = await generateEmbedding(queryText);

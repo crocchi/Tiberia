@@ -1,11 +1,12 @@
 import { Pinecone } from '@pinecone-database/pinecone';
 import { generateEmbedding } from '../utility/embeddings.js';
 import { PINECONE_API_KEY } from '../.devcontainer/config.js';
+import { INDEX_DB_NEWS, INDEX_DB_EVENTS } from '../.devcontainer/config.js';
 
 /**
  * Inizializza il client di Pinecone e restituisce un riferimento all'indice specificato.
  */
-export async function getPineconeIndex(indexDBName='tiberia-news') {
+export async function getPineconeIndex(indexDBName=INDEX_DB_EVENTS) {
     const pc = new Pinecone({
         apiKey: PINECONE_API_KEY,
     });
@@ -21,7 +22,7 @@ export async function getPineconeIndex(indexDBName='tiberia-news') {
  * @param {Array<Object>} items L'array di notizie o altri dati da processare.
  * @param {(item: Object) => string} textExtractor Funzione per estrarre il testo da ogni item.
  */
-export async function processAndSaveToPinecone(items, textExtractor,indexDBName='tiberia-news') {
+export async function processAndSaveToPinecone(items, textExtractor,indexDBName=INDEX_DB_EVENTS) {
     if (!items || items.length === 0) {
         console.log('Nessun dato di input fornito. Processo interrotto.');
         return;

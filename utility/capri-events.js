@@ -3,6 +3,7 @@
 
 //https://www.capripost.it/wp-json/wp/v2/posts?
 //after=2025-11-30T00:00:00&before=2025-12-01T00:00:00
+import {INDEX_DB_NEWS, INDEX_DB_EVENTS} from '../.devcontainer/config.js';
 import fetch from 'node-fetch';
 import { JSDOM } from 'jsdom';
 import { processAndSaveToPinecone } from '../DB/pineconeDB.js'; // Importiamo la funzione per salvare su Pinecone
@@ -64,14 +65,14 @@ function getTodayDateRange(startDateStr, endDateStr) {
 /**https://www.capripost.it/wp-json/wp/v2/posts?categories=7&after=2025-11-30T00:00:00
  * Scarica gli eventi del giorno, li processa e li salva su Pinecone.
  */
-export async function fetchAndIndexEvents(categoryID=[6],indexDBName='tiberia-news',startDay, endDay) {
+export async function fetchAndIndexEvents(categoryID=[6],indexDBName=INDEX_DB_EVENTS,startDay, endDay) {
     console.log('Esecuzione task: aggiornamento eventi di Capri...');
 
     const { startOfDay, endOfDay } = getTodayDateRange(startDay, endDay);
     console.log(`Intervallo di date per il fetch: da ${startOfDay} a ${endOfDay}\n ID: ${categoryID}`);
 
      const categoriesParam = Array.isArray(categoryID) ? categoryID.join(',') : categoryID;
-    let url=`https://www.capripost.it/wp-json/wp/v2/posts?categories=${categoriesParam}&after=${startOfDay}&before=${endOfDay}`;
+    let url=`https://www.capripost.it/wp-json/wp/v2/posts?per_page=80&categories=${categoriesParam}&after=${startOfDay}&before=${endOfDay}`;
 
     // Costruisci l'URL per ottenere i post di oggi nella categoria "Eventi"
     //const url = `${API_BASE_URL}?categories=${EVENTS_CATEGORY_ID}&after=${startOfDay}&before=${endOfDay}&per_page=100`;
