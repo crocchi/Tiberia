@@ -5,12 +5,14 @@ import { PINECONE_API_KEY } from '../.devcontainer/config.js';
 /**
  * Inizializza il client di Pinecone e restituisce un riferimento all'indice specificato.
  */
-export async function getPineconeIndex() {
+export async function getPineconeIndex(indexDBName='tiberia-news') {
     const pc = new Pinecone({
         apiKey: PINECONE_API_KEY,
     });
     // Il nome dell'indice che hai creato nella dashboard di Pinecone
-    return pc.index('tiberia-news'); 
+
+    //newscapri altro index db
+    return pc.index(indexDBName);
 }
 
 
@@ -19,14 +21,14 @@ export async function getPineconeIndex() {
  * @param {Array<Object>} items L'array di notizie o altri dati da processare.
  * @param {(item: Object) => string} textExtractor Funzione per estrarre il testo da ogni item.
  */
-export async function processAndSaveToPinecone(items, textExtractor) {
+export async function processAndSaveToPinecone(items, textExtractor,indexDBName='tiberia-news') {
     if (!items || items.length === 0) {
         console.log('Nessun dato di input fornito. Processo interrotto.');
         return;
     }
 
     try {
-        const index = await getPineconeIndex();
+        const index = await getPineconeIndex(indexDBName);
         console.log(`Processo ${items.length} items per il salvataggio su Pinecone...`);
 
         for (const item of items) {

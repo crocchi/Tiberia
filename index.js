@@ -36,12 +36,13 @@ function startEventsUpdater() {
     //fetchAndIndexEvents();
 
     // Esegui subito all'avvio
-    //fetchAndCacheNews();
+    fetchAndIndexEvents([3,4,7],'newscapri','2025/11/15','2025/12/01');//init DB
 
     // Programma l'esecuzione ogni ora per catturare nuovi eventi durante il giorno
     cron.schedule('30 23 * * *', () => {
         console.log('Esecuzione del task orario per gli eventi.ore 23:30');
-        fetchAndIndexEvents();
+        fetchAndIndexEvents([6],'tiberia-news'); //fetchano eventi del giorno
+        fetchAndIndexEvents([3,4,7],'newscapri'); //fetchano newsgenerali
     }, {
         scheduled: true,
         timezone: "Europe/Rome"

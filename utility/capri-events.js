@@ -8,17 +8,6 @@ import { JSDOM } from 'jsdom';
 import { processAndSaveToPinecone } from '../DB/pineconeDB.js'; // Importiamo la funzione per salvare su Pinecone
 
 
-
-const getDateToUpdate = ()=>{
-    const dataItaliana = new Date().toLocaleDateString("it-IT", {
-      timeZone: "Europe/Rome",
-      month: "2-digit",
-      day: "2-digit",
-      year: "numeric"
-    });
-    return `${dataItaliana.slice(0,10)}T00:00:00`;
-}
-
 function getTextFromHtml(htmlString) {
     if (!htmlString) return '';
     const dom = new JSDOM(htmlString);
@@ -32,15 +21,29 @@ function getTextFromHtml(htmlString) {
 
 tartOfDay: '2025-11-30T23:00:00.000Z', endOfDay: '2025-12-01T23:00:00.000Z'}
 */
-function getTodayDateRange() {
-    const now = new Date();
+function getTodayDateRange(startDateStr, endDateStr) {
+//getTodayDateRange('2025/12/01','2025/12/05')
+  let now,endOfDay;
+  if(startDateStr){
+
+    now = new Date(startDateStr);
+  }else{
+    now = new Date();
+  }
+  
     
     // Imposta l'inizio del giorno (mezzanotte) a Roma
     const startOfDay = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Rome" }));
     startOfDay.setHours(0, 0, 0, 0);
 
+    if(endDateStr){
+      endOfDay = new Date(endDateStr);
+    }else{
+       endOfDay = new Date(startOfDay);
+    }
+
     // Imposta la fine del giorno (mezzanotte del giorno dopo)
-    const endOfDay = new Date(startOfDay);
+   
     endOfDay.setDate(endOfDay.getDate() + 1);
 
     return {
@@ -49,23 +52,26 @@ function getTodayDateRange() {
     };
 }
 
-let categories=6;//eventi
 /*
 7=SPORT
 6=EVENTI
+4=CRONACA
+3=attualità
+
 */
 //url=`https://www.capripost.it/wp-json/wp/v2/posts?categories=${categories}&after=2025-11-25T00:00:00`;
 
 /**https://www.capripost.it/wp-json/wp/v2/posts?categories=7&after=2025-11-30T00:00:00
  * Scarica gli eventi del giorno, li processa e li salva su Pinecone.
  */
-export async function fetchAndIndexEvents() {
+export async function fetchAndIndexEvents(categoryID=[6],indexDBName='tiberia-news',startDay, endDay) {
     console.log('Esecuzione task: aggiornamento eventi di Capri...');
 
-    const { startOfDay, endOfDay } = getTodayDateRange();
-    console.log(`Intervallo di date per il fetch: da ${startOfDay} a ${endOfDay}`);
+    const { startOfDay, endOfDay } = getTodayDateRange(startDay, endDay);
+    console.log(`Intervallo di date per il fetch: da ${startOfDay} a ${endOfDay}\n ID: ${categoryID}`);
 
-    let url=`https://www.capripost.it/wp-json/wp/v2/posts?categories=${categories}&after=${startOfDay}&before=${endOfDay}`;
+     const categoriesParam = Array.isArray(categoryID) ? categoryID.join(',') : categoryID;
+    let url=`https://www.capripost.it/wp-json/wp/v2/posts?categories=${categoriesParam}&after=${startOfDay}&before=${endOfDay}`;
 
     // Costruisci l'URL per ottenere i post di oggi nella categoria "Eventi"
     //const url = `${API_BASE_URL}?categories=${EVENTS_CATEGORY_ID}&after=${startOfDay}&before=${endOfDay}&per_page=100`;
@@ -95,10 +101,10 @@ export async function fetchAndIndexEvents() {
         }));
 
         // Definisci come estrarre il testo per l'embedding
-        const eventTextExtractor = (item) => `Title: ${item.title}. Snippet: ${item.snippet}`;
+        const eventTextExtractor = (item) => `Title: ${item.title}. Date: ${item.pubDate}. Snippet: ${item.snippet}`;
 
         // Chiama la funzione per generare embeddings e salvare su Pinecone
-        await processAndSaveToPinecone(formattedEvents, eventTextExtractor);
+        await processAndSaveToPinecone(formattedEvents, eventTextExtractor, indexDBName);
 
     } catch (error) {
         console.error("Errore durante l'aggiornamento degli eventi:", error);

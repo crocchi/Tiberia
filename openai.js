@@ -2,6 +2,7 @@
 import { client, assistantId, bot, vectorStoreId } from './.devcontainer/config.js';
 import { fetchFerryTime } from './utility/fetchFerry.js';
 import { findSimilarItems } from './DB/pineconeDBsearch.js';
+import { getDateTime } from './utility/time.js';
 
 // Set per tenere traccia degli utenti che hanno una richiesta in corso
 export const busyUsers = new Set();
@@ -9,11 +10,10 @@ export const busyUsers = new Set();
 export const userThreads = {};
 
 
-
-
 // Funzione helper per processare una richiesta all'assistente
 export async function processAssistantRequest(chatId, inputText, responseType = 'text') {
 
+  let inputText=`[${getDateTime()}] ${inputText}`
   // 1. Controlla se l'utente è già "occupato"
   if (busyUsers.has(chatId)) {
     console.log(`Richiesta in attesa per ${chatId} perché una è già in corso.`);
