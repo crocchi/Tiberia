@@ -31,9 +31,6 @@ app.listen(port, () => {
  */
 function startEventsUpdater() {
     console.log('Avvio del servizio di aggiornamento eventi di Capri.');
-    
-    // Esegui subito all'avvio
-    //fetchAndIndexEvents();
 
     // Esegui subito all'avvio
     fetchAndIndexEvents([3,4,7],'newscapri','2025/11/15','2025/12/01');//init DB
