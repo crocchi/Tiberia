@@ -1,8 +1,10 @@
-//. TIBERIA V.0.0.2
+//. TIBERIA V.0.0.3
 
 import { app, port, client, assistantId, bot } from './.devcontainer/config.js';
 import { botOnMsg,botOnVoice,botOnLocation } from './telegram.js';
 import { startNewsUpdater } from './utility/capri-news.js';
+import cron from 'node-cron';
+import { fetchAndIndexEvents } from './utility/capri-events.js';
 
 
 // --- GESTIONE EVENTI TELEGRAM ---
@@ -22,4 +24,27 @@ app.listen(port, () => {
 });
 
 //fetchFerryTime();
-startNewsUpdater()
+//startNewsUpdater()
+
+/**
+ * Avvia il processo di aggiornamento periodico degli eventi.
+ */
+function startEventsUpdater() {
+    console.log('Avvio del servizio di aggiornamento eventi di Capri.');
+    
+    // Esegui subito all'avvio
+    fetchAndIndexEvents();
+
+    // Programma l'esecuzione ogni ora per catturare nuovi eventi durante il giorno
+    cron.schedule('0 2 * * *', () => {
+        console.log('Esecuzione del task orario per gli eventi.ore 02:00');
+        fetchAndIndexEvents();
+    }, {
+        scheduled: true,
+        timezone: "Europe/Rome"
+    });
+
+    console.log('Task di aggiornamento eventi programmato ogni ora.');
+}
+
+fetchAndIndexEvents();

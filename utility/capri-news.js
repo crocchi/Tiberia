@@ -8,6 +8,7 @@ import cron from 'node-cron'; // 1. Importa node-cron
 import { JSDOM } from 'jsdom'; 
 
 const FEED_URL = 'https://www.capripost.it/feed/';
+//https://www.capripost.it/wp-json/wp/v2/posts?per_page=100
 const CACHE_DIR = path.join(process.cwd(), 'cache');
 const NEWS_CACHE_FILE = path.join(CACHE_DIR, 'capri-news.json');
 
@@ -30,13 +31,13 @@ export async function fetchAndCacheNews() {
         const newsItems = feed.items.slice(0, 20).map(item => {
             // Usa il campo 'content:encoded' che è più ricco, e puliscilo dall'HTML
             const fullContent = getTextFromHtml(item['content:encoded'] || item.content);
-            
+            const cleanedContent = fullContent.replace(/proviene da Capri Post\./gi, '');
             return {
                 title: item.title,
                 link: item.link,
                 pubDate: item.pubDate,
                 // Crea uno snippet più lungo e pulito dal contenuto completo
-                snippet: fullContent//.substring(0, 250) + '...'
+                snippet: cleanedContent//.substring(0, 250) + '...'
             };
         });
         await fs.mkdir(CACHE_DIR, { recursive: true });

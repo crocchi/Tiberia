@@ -1,6 +1,10 @@
 import express from 'express';
 import OpenAI from "openai";
 import TelegramBot from 'node-telegram-bot-api';
+import dotenv from 'dotenv';
+
+// Carica le variabili d'ambiente dal file .env
+dotenv.config();
 
 // --- CONFIGURAZIONE EXPRESS ---
 const app = express();
@@ -27,5 +31,8 @@ if (!token) {
 
 const bot = new TelegramBot(token, { polling: true });
 // --- FINE CONFIGURAZIONE TELEGRAM ---
+
+///////////SE C R E T W I TH L O V E/////////////
+export const PINECONE_API_KEY = process.env.PINECONE_API_KEY;
 
 export { app, port, client, assistantId, bot , vectorStoreId};
