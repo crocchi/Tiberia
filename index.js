@@ -33,9 +33,9 @@ app.listen(port, () => {
 function startEventsUpdater() {
     console.log('Avvio del servizio di aggiornamento eventi di Capri.');
 
-    // Esegui subito all'avvio
-    fetchAndIndexEvents([3,4,7],INDEX_DB_NEWS,'2025/11/15','2025/12/01');//init DB
-    fetchAndIndexEvents([6], INDEX_DB_EVENTS, '2025/11/15','2025/12/01');
+    // inizializza il DB VECTOR startup
+   // fetchAndIndexEvents([3,4,7],INDEX_DB_NEWS,'2025/11/15','2025/12/01');//init DB
+    //fetchAndIndexEvents([6], INDEX_DB_EVENTS, '2025/11/15','2025/12/01');
 
     // Programma l'esecuzione ogni ora per catturare nuovi eventi durante il giorno
     cron.schedule('30 23 * * *', () => {
