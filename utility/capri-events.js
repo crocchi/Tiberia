@@ -5,7 +5,7 @@
 //after=2025-11-30T00:00:00&before=2025-12-01T00:00:00
 import fetch from 'node-fetch';
 import { JSDOM } from 'jsdom';
-import { processAndSaveToPinecone } from '../.DB/pineconeDB.js'; // Importiamo la funzione per salvare su Pinecone
+import { processAndSaveToPinecone } from '../DB/pineconeDB.js'; // Importiamo la funzione per salvare su Pinecone
 
 
 
