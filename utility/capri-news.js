@@ -53,23 +53,6 @@ export async function fetchAndCacheNews() {
 /**
  * Avvia il processo di aggiornamento periodico delle notizie.
  */
-export function startNewsUpdater() {
-    console.log('Avvio del servizio di aggiornamento notizie di Capri.');
-    
-    // Esegui subito la prima volta all'avvio dell'applicazione
-    fetchAndCacheNews();
-
-    // 2. Programma l'esecuzione del task ogni giorno alle 4:00 del mattino
-    cron.schedule('0 4 * * *', () => {
-        console.log('Esecuzione del task giornaliero programmato con node-cron.');
-        fetchAndCacheNews();
-    }, {
-        scheduled: true,
-        timezone: "Europe/Rome"
-    });
-
-    console.log('Task di aggiornamento notizie programmato per le 04:00 ogni giorno.');
-}
 
 function getTextFromHtml(htmlString) {
     if (!htmlString) return '';

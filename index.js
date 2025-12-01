@@ -2,7 +2,7 @@
 
 import { app, port, client, assistantId, bot } from './.devcontainer/config.js';
 import { botOnMsg,botOnVoice,botOnLocation } from './telegram.js';
-import { startNewsUpdater } from './utility/capri-news.js';
+import { fetchAndCacheNews } from './utility/capri-news.js';
 import cron from 'node-cron';
 import { fetchAndIndexEvents } from './utility/capri-events.js';
 
@@ -34,6 +34,9 @@ function startEventsUpdater() {
     
     // Esegui subito all'avvio
     fetchAndIndexEvents();
+
+    // Esegui subito all'avvio
+    fetchAndCacheNews();
 
     // Programma l'esecuzione ogni ora per catturare nuovi eventi durante il giorno
     cron.schedule('0 2 * * *', () => {
