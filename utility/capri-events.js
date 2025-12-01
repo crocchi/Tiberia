@@ -19,6 +19,13 @@ const getDateToUpdate = ()=>{
     return `${dataItaliana.slice(0,10)}T00:00:00`;
 }
 
+function getTextFromHtml(htmlString) {
+    if (!htmlString) return '';
+    const dom = new JSDOM(htmlString);
+    dom.window.document.querySelectorAll('script, style, img, ins').forEach(el => el.remove());
+    return dom.window.document.body.textContent.replace(/\s\s+/g, ' ').trim();
+}
+
 let categories=7;//eventi
 let url=`https://www.capripost.it/wp-json/wp/v2/posts?categories=${categories}&after=${getDateToUpdate()}`;
 url=`https://www.capripost.it/wp-json/wp/v2/posts?categories=${categories}&after=2025-11-27T00:00:00`;
