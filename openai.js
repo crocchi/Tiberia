@@ -5,6 +5,7 @@ import { findSimilarItems } from './DB/pineconeDBsearch.js';
 import { getDateTime } from './utility/time.js';
 import { INDEX_DB_EVENTS, INDEX_DB_NEWS, INDEX_DB_WEATHER } from './.devcontainer/config.js';
 import { getWeather } from './utility/getWeather.js';
+import { saveUserThreadEmbedding } from './utility/social.js';
 
 // Set per tenere traccia degli utenti che hanno una richiesta in corso
 export const busyUsers = new Set();
@@ -77,7 +78,7 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
         const functionName = toolCall.function.name;
         const args = JSON.parse(toolCall.function.arguments);
         let output;
-        
+
         console.log("Tool richiesto:", functionName, args);
         if (functionName === 'getFerryTimes') {
           console.log(`Esecuzione tool 'getFerryTimes' con argomenti:`, args);
@@ -133,6 +134,9 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
       if (assistantResponse && assistantResponse.content[0].type === 'text') {
         const responseText = assistantResponse.content[0].text.value;
         console.log(`Risposta dell'assistente per ${chatId}: ${responseText}`);
+
+        // Salva l'embedding della conversazione dell'utente
+        saveUserThreadEmbedding(chatId, {inputText, responseText}, INDEX_DB_USER, threadId);
 
         if (responseType === 'voice') {
           console.log("Generazione risposta audio...");
