@@ -1,5 +1,5 @@
 import { Pinecone } from '@pinecone-database/pinecone';
-import { generateEmbedding } from '../.utility/embeddings.js';
+import { generateEmbedding } from '../utility/embeddings.js';
 import { PINECONE_API_KEY } from '../.devcontainer/config.js';
 
 /**
