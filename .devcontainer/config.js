@@ -34,10 +34,12 @@ const bot = new TelegramBot(token, { polling: true });
 
 ///////////SE C R E T W I TH L O V E/////////////
 export const PINECONE_API_KEY = process.env.PINECONE_API_KEY;
+export const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
 
 //////////////////////// NOMI DB - INDEX NAME///////////////////////
 
 export const INDEX_DB_EVENTS = 'tiberia-events';
 export const INDEX_DB_NEWS = 'tiberia-news';
+export const INDEX_DB_WEATHER = 'tiberia-weather';
 
 export { app, port, client, assistantId, bot , vectorStoreId};

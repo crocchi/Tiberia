@@ -3,7 +3,8 @@ import { client, assistantId, bot, vectorStoreId } from './.devcontainer/config.
 import { fetchFerryTime } from './utility/fetchFerry.js';
 import { findSimilarItems } from './DB/pineconeDBsearch.js';
 import { getDateTime } from './utility/time.js';
-import {INDEX_DB_EVENTS, INDEX_DB_NEWS} from './.devcontainer/config.js';
+import { INDEX_DB_EVENTS, INDEX_DB_NEWS, INDEX_DB_WEATHER } from './.devcontainer/config.js';
+import { getWeather } from './utility/getWeather.js';
 
 // Set per tenere traccia degli utenti che hanno una richiesta in corso
 export const busyUsers = new Set();
@@ -19,7 +20,7 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
   if (busyUsers.has(chatId)) {
     console.log(`Richiesta in attesa per ${chatId} perché una è già in corso.`);
     while (busyUsers.has(chatId)) {
-      await new Promise(resolve => setTimeout(resolve, 800));
+      await new Promise(resolve => setTimeout(resolve, 2000));
     }
   }
   // 2. Blocca l'utente
@@ -91,6 +92,16 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
           output = JSON.stringify(searchResults);
         }
 
+        if (functionName === 'getWeather') {
+          console.log(`Esecuzione tool 'getWeather' con argomenti:`, args);
+          const weatherMsg = await getWeather(args.location);
+          output = weatherMsg || "Impossibile ottenere il meteo al momento.";
+        }
+        if (functionName === 'searchWeather') {
+          console.log(`Esecuzione tool 'searchWeather' con argomenti:`, args);
+          const searchResults = await findSimilarItems(args.queryText, 3, INDEX_DB_WEATHER);
+          output = JSON.stringify(searchResults);
+        }
         if (output) {
           toolOutputs.push({
             tool_call_id: toolCall.id,
@@ -119,6 +130,7 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
 
       if (assistantResponse && assistantResponse.content[0].type === 'text') {
         const responseText = assistantResponse.content[0].text.value;
+        console.log(`Risposta dell'assistente per ${chatId}: ${responseText}`);
 
         if (responseType === 'voice') {
           console.log("Generazione risposta audio...");

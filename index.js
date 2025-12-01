@@ -5,6 +5,7 @@ import { botOnMsg,botOnVoice,botOnLocation } from './telegram.js';
 import { fetchAndCacheNews } from './utility/capri-news.js';
 import cron from 'node-cron';
 import { fetchAndIndexEvents } from './utility/capri-events.js';
+import { getWeather } from './utility/getWeather.js';
 
 
 
