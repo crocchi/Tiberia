@@ -3,7 +3,7 @@ import { client, assistantId, bot, vectorStoreId } from './.devcontainer/config.
 import { fetchFerryTime } from './utility/fetchFerry.js';
 import { findSimilarItems } from './DB/pineconeDBsearch.js';
 import { getDateTime } from './utility/time.js';
-import { INDEX_DB_EVENTS, INDEX_DB_NEWS, INDEX_DB_WEATHER } from './.devcontainer/config.js';
+import { INDEX_DB_EVENTS, INDEX_DB_NEWS, INDEX_DB_WEATHER,INDEX_DB_USER } from './.devcontainer/config.js';
 import { getWeather } from './utility/getWeather.js';
 import { saveUserThreadEmbedding } from './utility/social.js';
 
