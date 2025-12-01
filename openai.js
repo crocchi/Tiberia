@@ -71,6 +71,7 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
     if (run.status === 'requires_action') {
       const toolCalls = run.required_action.submit_tool_outputs.tool_calls;
       const toolOutputs = [];
+      console.log("Tool richiesto:", functionName, args);
 
       for (const toolCall of toolCalls) {
         const functionName = toolCall.function.name;
@@ -97,7 +98,7 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
           const weatherMsg = await getWeather(args.location);
           output = weatherMsg || "Impossibile ottenere il meteo al momento.";
         }
-        if (functionName === 'searchWeather') {
+        if (functionName === 'searchWeather') {//searchWeather
           console.log(`Esecuzione tool 'searchWeather' con argomenti:`, args);
           const searchResults = await findSimilarItems(args.queryText, 3, INDEX_DB_WEATHER);
           output = JSON.stringify(searchResults);

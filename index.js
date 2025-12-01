@@ -2,7 +2,6 @@
 
 import { app, port, client, assistantId, bot,INDEX_DB_NEWS, INDEX_DB_EVENTS } from './.devcontainer/config.js';
 import { botOnMsg,botOnVoice,botOnLocation } from './telegram.js';
-import { fetchAndCacheNews } from './utility/capri-news.js';
 import cron from 'node-cron';
 import { fetchAndIndexEvents } from './utility/capri-events.js';
 import { getWeather } from './utility/getWeather.js';
