@@ -71,13 +71,14 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
     if (run.status === 'requires_action') {
       const toolCalls = run.required_action.submit_tool_outputs.tool_calls;
       const toolOutputs = [];
-      console.log("Tool richiesto:", functionName, args);
+
 
       for (const toolCall of toolCalls) {
         const functionName = toolCall.function.name;
         const args = JSON.parse(toolCall.function.arguments);
         let output;
-
+        
+        console.log("Tool richiesto:", functionName, args);
         if (functionName === 'getFerryTimes') {
           console.log(`Esecuzione tool 'getFerryTimes' con argomenti:`, args);
           output = await fetchFerryTime(args.trattaKey);
