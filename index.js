@@ -5,7 +5,7 @@ import { app, port, client, assistantId, bot,INDEX_DB_NEWS, INDEX_DB_EVENTS } fr
 import { botOnMsg,botOnVoice,botOnLocation } from './telegram.js';
 import cron from 'node-cron';
 import { fetchAndIndexEvents } from './utility/capri-events.js';
-import { getWeather } from './utility/getWeather.js';
+import { loadUserThreadsFromVectorDB } from './DB/loadThreadsID.js';
 
 
 
