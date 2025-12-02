@@ -21,7 +21,6 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-scripts": "^5.0.1",
-    "express": "5.1.0",
     "three": "0.181.2",
     "@react-three/fiber": "9.4.2",
     "@react-three/drei": "10.7.7"
