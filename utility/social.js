@@ -11,7 +11,7 @@ export async function saveUserThreadEmbedding(telegramId, messages, indexName = 
     const index = await getPineconeIndex(indexName);
 
     await index.upsert([{
-        id: telegramId,
+        id: `${telegramId}`,
         values: embedding,
         metadata: { lastUpdate: Date.now(), threadText , threadID: threadId }
     }]);
