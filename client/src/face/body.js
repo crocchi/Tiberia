@@ -14,7 +14,7 @@ export default function TiberiaFace({ audioSrc }) {
         <ambientLight />
         <Avatar lipsync={0} />
       </Canvas>
-      <h2>Ciao, sono Tiberia!</h2>
+      <h2>Ciao, sono Tiberia!!</h2>
     </div>
   );
 }
