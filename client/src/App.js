@@ -5,7 +5,6 @@ function App() {
   return (
     <div>
  <TiberiaFace />
-      <h2>bEnVenUTi?=!</h2>
     </div>
   );
 }

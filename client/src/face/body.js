@@ -3,7 +3,7 @@ import { Canvas } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
 
 function Avatar({ lipsync }) {
-  const { scene } = useGLTF('/models/Duck.glb');
+  const { scene } = useGLTF('/models/girl.glb');
   return <primitive object={scene} />;
 }
 
