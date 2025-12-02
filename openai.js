@@ -14,8 +14,10 @@ export const userThreads = {};
 
 
 // Funzione helper per processare una richiesta all'assistente
-export async function processAssistantRequest(chatId, inputText, responseType = 'text') {
-
+export async function processAssistantRequest(chatId, inputText, responseType = 'text', userinfo = null) {
+if (userinfo) {
+  const { userFirstName, userUsername } = userinfo;
+}
   inputText = `[${getDateTime()}] ${inputText}`
   // 1. Controlla se l'utente è già "occupato"
   if (busyUsers.has(chatId)) {
@@ -136,7 +138,7 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
         console.log(`Risposta dell'assistente per ${chatId}: ${responseText}`);
 
         // Salva l'embedding della conversazione dell'utente
-        saveUserThreadEmbedding(chatId, {inputText, responseText}, INDEX_DB_USER, threadId);
+        saveUserThreadEmbedding({chatId,userFirstName, userUsername}, {inputText, responseText}, INDEX_DB_USER, threadId);
 
         if (responseType === 'voice') {
           console.log("Generazione risposta audio...");

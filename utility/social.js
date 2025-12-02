@@ -3,15 +3,17 @@ import { getPineconeIndex } from '../DB/pineconeDB.js';
 import { INDEX_DB_USER } from '../.devcontainer/config.js';
 import cron from 'node-cron';
 
-export async function saveUserThreadEmbedding(telegramId, messages, indexName = INDEX_DB_USER, threadId = null) {
+export async function saveUserThreadEmbedding(userinfo, messages, indexName = INDEX_DB_USER, threadId = null) {
+    const { chatId, userFirstName, userUsername } = userinfo;
     const { inputText, responseText } = messages;
-    const threadText = `User[${telegramId}] Msg:[${inputText}] - [Tiberia]: Msg:${responseText}`;
-    console.log(`Salvataggio embedding per utente ${telegramId} nel DB ${indexName}`);
+
+    const threadText = `User[${chatId}] Msg:[${inputText}] - [Tiberia]: Msg:${responseText}`;
+    console.log(`Salvataggio embedding per utente ${chatId} nel DB ${indexName}`);
     const embedding = await generateEmbedding(threadText);
     const index = await getPineconeIndex(indexName);
 
     await index.upsert([{
-        id: `${telegramId}`,
+        id: `${chatId}-${userFirstName}@${userUsername}`, // ID unico per ogni messaggio
         values: embedding,
         metadata: { lastUpdate: Date.now(), threadText , threadID: threadId }
     }]);

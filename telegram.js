@@ -24,7 +24,7 @@ export const botOnMsg = (msg) => {
     const { chatId, msgInfo, userInput } = whois(msg);
 
     console.log(msgInfo);
-    processAssistantRequest(chatId, userInput, 'text');
+    processAssistantRequest(chatId, userInput, 'text',{userFirstName,userUsername});
 };
 
 
