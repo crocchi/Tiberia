@@ -20,11 +20,16 @@ export const botOnMsg = (msg) => {
     if (msg.location || !msg.text || msg.voice) {
         return;
     }
+try{
+
 
     const { chatId, msgInfo, userInput, userFirstName, userUsername } = whois(msg);
 
     console.log(msgInfo);
     processAssistantRequest(chatId, userInput, 'text', { userFirstName, userUsername });
+    } catch (error) {
+        console.error("Errore durante la gestione del messaggio:\n", error);
+    }
 };
 
 
