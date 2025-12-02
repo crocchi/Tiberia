@@ -6,15 +6,14 @@ import cron from 'node-cron';
 export async function saveUserThreadEmbedding(telegramId, messages, indexName = INDEX_DB_USER, threadId = null) {
     const { inputText, responseText } = messages;
     const threadText = `User[${telegramId}] Msg:[${inputText}] - [Tiberia]: Msg:${responseText}`;
-   // console.log(`Salvataggio embedding per utente ${telegramId} nel DB ${indexName}`);
+    console.log(`Salvataggio embedding per utente ${telegramId} nel DB ${indexName}`);
     const embedding = await generateEmbedding(threadText);
     const index = await getPineconeIndex(indexName);
 
     await index.upsert([{
         id: telegramId,
-        thread: threadId,
         values: embedding,
-        metadata: { lastUpdate: Date.now(), threadText }
+        metadata: { lastUpdate: Date.now(), threadText , threadID: threadId }
     }]);
 }
 
