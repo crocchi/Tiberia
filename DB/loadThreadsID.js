@@ -1,4 +1,4 @@
-import { getPineconeIndex } from './DB/pineconeDB.js';
+import { getPineconeIndex } from './pineconeDB.js';
 import { INDEX_DB_USER } from './.devcontainer/config.js';
 import { userThreads } from '../openai.js';
 
