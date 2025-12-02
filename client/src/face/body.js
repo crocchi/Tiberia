@@ -6,7 +6,12 @@ import { useFrame } from '@react-three/fiber';
 function Avatar({ lipsync }) {
   const { scene } = useGLTF('/models/girl.glb');
   useFrame(() => {
-    scene.rotation.y += 0.01; // ruota il modello
+    const mouth = scene.getObjectByName('Mouth');
+    if (mouth) {
+      // Modifica la scala Y per simulare apertura/chiusura bocca
+      mouth.scale.y = 1 + Math.abs(Math.sin(Date.now() * 0.005)) * 0.5;
+    }
+    scene.rotation.y += 0.01;
   });
   return <primitive object={scene} />;
 }
@@ -22,3 +27,7 @@ export default function TiberiaFace({ audioSrc }) {
     </div>
   );
 }
+
+React.useEffect(() => {
+  console.log(scene.children.map(obj => obj.name));
+}, [scene]);
