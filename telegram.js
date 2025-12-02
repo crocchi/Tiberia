@@ -21,10 +21,10 @@ export const botOnMsg = (msg) => {
         return;
     }
 
-    const { chatId, msgInfo, userInput } = whois(msg);
+    const { chatId, msgInfo, userInput, userFirstName, userUsername } = whois(msg);
 
     console.log(msgInfo);
-    processAssistantRequest(chatId, userInput, 'text',{userFirstName,userUsername});
+    processAssistantRequest(chatId, userInput, 'text', { userFirstName, userUsername });
 };
 
 
