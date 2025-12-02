@@ -3,7 +3,7 @@ import { client, assistantId, bot, vectorStoreId } from './.devcontainer/config.
 import { fetchFerryTime } from './utility/fetchFerry.js';
 import { findSimilarItems } from './DB/pineconeDBsearch.js';
 import { getDateTime } from './utility/time.js';
-import { INDEX_DB_EVENTS, INDEX_DB_NEWS, INDEX_DB_WEATHER,INDEX_DB_USER } from './.devcontainer/config.js';
+import { INDEX_DB_EVENTS, INDEX_DB_NEWS, INDEX_DB_WEATHER, INDEX_DB_USER } from './.devcontainer/config.js';
 import { getWeather } from './utility/getWeather.js';
 import { saveUserThreadEmbedding } from './utility/social.js';
 
@@ -74,57 +74,30 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
     // GESTISCI LA RICHIESTA DI ESEGUIRE UN TOOL
     if (run.status === 'requires_action') {
       const toolCalls = run.required_action.submit_tool_outputs.tool_calls;
-      const toolOutputs = [];
 
-
-      for (const toolCall of toolCalls) {
-        const functionName = toolCall.function.name;
-        const args = JSON.parse(toolCall.function.arguments);
-        let output;
-
-        console.log("Tool richiesto:", functionName, args);
-        if (functionName === 'getFerryTimes') {
-          console.log(`Esecuzione tool 'getFerryTimes' con argomenti:`, args);
-          output = await fetchFerryTime(args.trattaKey);
-
-        } else if (functionName === 'searchNews') {
-          console.log(`Esecuzione tool 'searchNews' con argomenti:`, args);
-          const searchResults = await findSimilarItems(args.queryText, 3, INDEX_DB_NEWS); // Cerca i 3 risultati migliori
-          // L'assistente si aspetta una stringa, quindi convertiamo l'array di risultati in JSON
-          output = JSON.stringify(searchResults);
-        } else if (functionName === 'searchEvent') {
-          // Cerca negli eventi (indice Pinecone: 'tiberia-events')
-          const searchResults = await findSimilarItems(args.queryText, 3, INDEX_DB_EVENTS);
-          output = JSON.stringify(searchResults);
-        }
-
-        if (functionName === 'getWeather') {
-          console.log(`Esecuzione tool 'getWeather' con argomenti:`, args);
-          const weatherMsg = await getWeather(args.location);
-          output = weatherMsg || "Impossibile ottenere il meteo al momento.";
-        }
-        if (functionName === 'searchWeather') {//searchWeather
-          console.log(`Esecuzione tool 'searchWeather' con argomenti:`, args);
-          const searchResults = await findSimilarItems(args.queryText, 3, INDEX_DB_WEATHER);
-          output = JSON.stringify(searchResults);
-        }
-        if (output) {
-          toolOutputs.push({
-            tool_call_id: toolCall.id,
-            output: output,
-          });
-        }
-
-      }
+      //gestisci tutte le chiamate ai tool
+      const toolOutputs = await handleToolCalls(toolCalls);
 
       // Invia i risultati del tool all'assistente
       run = await client.beta.threads.runs.submitToolOutputs(threadId, run.id, {
         tool_outputs: toolOutputs,
       });
-      // Continua ad attendere il completamento
-      while (['queued', 'in_progress', 'cancelling'].includes(run.status)) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        run = await client.beta.threads.runs.retrieve(threadId, run.id);
+
+      // Gestione ciclica di run.status
+      while (true) {
+        if (['queued', 'in_progress', 'cancelling'].includes(run.status)) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          run = await client.beta.threads.runs.retrieve(threadId, run.id);
+        } else if (run.status === 'requires_action') {
+          const toolCalls = run.required_action.submit_tool_outputs.tool_calls;
+          const toolOutputs = await handleToolCalls(toolCalls);
+
+          run = await client.beta.threads.runs.submitToolOutputs(threadId, run.id, {
+            tool_outputs: toolOutputs,
+          });
+        } else {
+          break;
+        }
       }
     }
 
@@ -139,7 +112,7 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
         console.log(`Risposta dell'assistente per ${chatId}: ${responseText}`);
 
         // Salva l'embedding della conversazione dell'utente
-        saveUserThreadEmbedding({chatId,userFirstName, userUsername}, {inputText, responseText}, INDEX_DB_USER, threadId);
+        saveUserThreadEmbedding({ chatId, userFirstName, userUsername }, { inputText, responseText }, INDEX_DB_USER, threadId);
 
         if (responseType === 'voice') {
           console.log("Generazione risposta audio...");
@@ -172,3 +145,37 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
     busyUsers.delete(chatId);
   }
 };
+
+async function handleToolCalls(toolCalls) {
+  const toolOutputs = [];
+  for (const toolCall of toolCalls) {
+    const functionName = toolCall.function.name;
+    const args = JSON.parse(toolCall.function.arguments);
+    let output;
+
+    console.log(`Esecuzione tool ${functionName} con argomenti:`, args);
+    if (functionName === 'getFerryTimes') {
+      output = await fetchFerryTime(args.trattaKey);
+    } else if (functionName === 'searchNews') {
+      const searchResults = await findSimilarItems(args.queryText, 3, INDEX_DB_NEWS);
+      output = JSON.stringify(searchResults);
+    } else if (functionName === 'searchEvent') {
+      const searchResults = await findSimilarItems(args.queryText, 3, INDEX_DB_EVENTS);
+      output = JSON.stringify(searchResults);
+    } else if (functionName === 'getWeather') {
+      const weatherMsg = await getWeather(args.location);
+      output = weatherMsg || "Impossibile ottenere il meteo al momento.";
+    } else if (functionName === 'searchWeather') {
+      const searchResults = await findSimilarItems(args.queryText, 3, INDEX_DB_WEATHER);
+      output = JSON.stringify(searchResults);
+    }
+
+    if (output) {
+      toolOutputs.push({
+        tool_call_id: toolCall.id,
+        output: output,
+      });
+    }
+  }
+  return toolOutputs;
+}
