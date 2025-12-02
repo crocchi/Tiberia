@@ -20,7 +20,7 @@ export async function generateEmbedding(text) {
         });
 
         // Estrai e restituisci il vettore di embedding
-        console.log("Embedding generato:", response.data[0].embedding);
+        console.log("Embedding generato:"/*, response.data[0].embedding*/);
         return response.data[0].embedding;
 
     } catch (error) {

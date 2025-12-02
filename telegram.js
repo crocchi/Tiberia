@@ -54,7 +54,6 @@ export const botOnVoice = async (msg) => {
         }
         //const audioBuffer = await response.buffer();
 
-        bot.sendChatAction(chatId, 'record_voice');
         // 3. Trascrivi l'audio usando OpenAI Whisper
         // Nota: la libreria openai si aspetta un oggetto con nome file e stream
         const transcription = await client.audio.transcriptions.create({

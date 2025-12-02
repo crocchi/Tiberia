@@ -24,12 +24,19 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
   if (busyUsers.has(chatId)) {
     console.log(`Richiesta in attesa per ${chatId} perché una è già in corso.`);
     while (busyUsers.has(chatId)) {
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 3000));
     }
   }
   // 2. Blocca l'utente
   busyUsers.add(chatId);
-  bot.sendChatAction(chatId, 'typing');
+
+  // Invia azione di "sta scrivendo o vocale" ogni 4 secondi
+  let typeOfResponse = responseType;
+  typeOfResponse = typeOfResponse === 'voice' ? 'record_voice' : 'typing';
+  let typingInterval = setInterval(() => {
+    bot.sendChatAction(chatId, typeOfResponse);
+  }, 4000);
+
 
   try {
 
@@ -142,6 +149,8 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
     console.error("Errore durante l'elaborazione della richiesta:", error);
     await bot.sendMessage(chatId, "Spiacente, si è verificato un errore. Riprova più tardi.");
   } finally {
+    // Quando hai finito:
+    clearInterval(typingInterval);
     busyUsers.delete(chatId);
   }
 };
