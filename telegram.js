@@ -4,7 +4,7 @@ import { processAssistantRequest } from './openai.js';
 
 const whois =(data)=>{
     const userFirstName = data.from?.first_name || "Utente";
-    const userUsername = data.from?.username || "Sconosciuto"; // Questo è il nickname
+    const userUsername = data.from?.username || data.from?.first_name || "Sconosciuto"; // Questo è il nickname
     const chatId = data.chat?.id || null;
     const userInput = data.text || "";
     const fileId = data?.voice?.file_id || null;

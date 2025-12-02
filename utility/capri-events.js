@@ -8,6 +8,7 @@ import fetch from 'node-fetch';
 import { JSDOM } from 'jsdom';
 import { processAndSaveToPinecone } from '../DB/pineconeDB.js'; // Importiamo la funzione per salvare su Pinecone
 
+let qntNews=80; //massimo 100 per richiesta WP
 
 function getTextFromHtml(htmlString) {
     if (!htmlString) return '';
@@ -54,8 +55,10 @@ function getTodayDateRange(startDateStr, endDateStr) {
 }
 
 /*
+8=video
 7=SPORT
 6=EVENTI
+5=people
 4=CRONACA
 3=attualità
 
@@ -65,14 +68,14 @@ function getTodayDateRange(startDateStr, endDateStr) {
 /**https://www.capripost.it/wp-json/wp/v2/posts?categories=7&after=2025-11-30T00:00:00
  * Scarica gli eventi del giorno, li processa e li salva su Pinecone.
  */
-export async function fetchAndIndexEvents(categoryID=[6],indexDBName=INDEX_DB_EVENTS,startDay, endDay) {
+export async function fetchAndIndexEvents(categoryID=[6],indexDBName=INDEX_DB_EVENTS,startDay, endDay,qnt=qntNews) {
     console.log('Esecuzione task: aggiornamento eventi di Capri...');
 
     const { startOfDay, endOfDay } = getTodayDateRange(startDay, endDay);
     console.log(`Intervallo di date per il fetch: da ${startOfDay} a ${endOfDay}\n ID: ${categoryID}`);
 
      const categoriesParam = Array.isArray(categoryID) ? categoryID.join(',') : categoryID;
-    let url=`https://www.capripost.it/wp-json/wp/v2/posts?per_page=80&categories=${categoriesParam}&after=${startOfDay}&before=${endOfDay}`;
+    let url=`https://www.capripost.it/wp-json/wp/v2/posts?per_page=${qnt}&categories=${categoriesParam}&after=${startOfDay}&before=${endOfDay}`;
 
     // Costruisci l'URL per ottenere i post di oggi nella categoria "Eventi"
     //const url = `${API_BASE_URL}?categories=${EVENTS_CATEGORY_ID}&after=${startOfDay}&before=${endOfDay}&per_page=100`;

@@ -44,8 +44,9 @@ function startEventsUpdater() {
     console.log('Avvio del servizio di aggiornamento eventi di Capri.');
 
     // inizializza il DB VECTOR startup
-   // fetchAndIndexEvents([3,4,7],INDEX_DB_NEWS,'2025/11/15','2025/12/01');//init DB
-    //fetchAndIndexEvents([6], INDEX_DB_EVENTS, '2025/11/15','2025/12/01');
+   // fetchAndIndexEvents([3,4,5,7],INDEX_DB_NEWS,'2025/11/15','2025/12/01',80);//init DB
+    //fetchAndIndexEvents([6], INDEX_DB_EVENTS, '2025/11/15','2025/12/01',100);//init DB
+    //fetchAndIndexEvents(categorie scelte,database name,data start, data end, quantita);//init DB eventi odierni
 
     // Carica i thread esistenti dal DB vettoriale
     loadUserThreadsFromVectorDB()
