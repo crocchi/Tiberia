@@ -19,7 +19,9 @@ export async function loadUserThreadsFromVectorDB() {
             //585151280@Crocchii[02/12/2025 15:03:27]
             const nicknameMatch = match.id.match(/@(.*?)(?=\[|$)/);
             const nickname = nicknameMatch ? nicknameMatch[1] : null;
-            nicknames.push(nickname);
+            if(!nicknames.includes(nickname)) {
+                nicknames.push(nickname);
+            }
             const cleaned = match.id.replace(/@.*?(?=\[]|$)/, '');
             const chatId = cleaned;
             const threadId = match.metadata.threadID;
