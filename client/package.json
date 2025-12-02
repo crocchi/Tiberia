@@ -1,0 +1,28 @@
+{
+  "name": "tiberia-client",
+  "version": "0.0.1",
+  "description": "Frontend React per Tiberia, AI guide for Capri",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build"
+  },
+  "keywords": [
+    "tiberia",
+    "capri",
+    "ai",
+    "tourism",
+    "travel"
+  ],
+  "author": "crocchi",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-scripts": "^5.0.1",
+    "three": "0.181.2",
+    "@react-three/fiber": "9.4.2",
+    "@react-three/drei": "10.7.7"
+  }
+}

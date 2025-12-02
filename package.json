@@ -1,13 +1,12 @@
 {
-  "name": "Tiberia",
-  "version": "0.0.1",
+  "name": "tiberia-backend",
+  "version": "0.0.5",
   "description": "Ai guide for Capri",
   "main": "index.js",
   "type": "module",
- "scripts": {
-  "build-client": "cd client && npm install && npm run build",
-  "start": "npm run build-client && node index.js"
-},
+  "scripts": {
+    "start": "node index.js"
+  },
   "keywords": [
     "tiberia",
     "capri",
