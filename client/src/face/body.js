@@ -13,6 +13,9 @@ function Avatar({ lipsync }) {
     }
     scene.rotation.y += 0.01;
   });
+  React.useEffect(() => {
+  console.log(scene.children.map(obj => obj.name));
+}, [scene]);
   return <primitive object={scene} />;
 }
 
@@ -28,6 +31,3 @@ export default function TiberiaFace({ audioSrc }) {
   );
 }
 
-React.useEffect(() => {
-  console.log(scene.children.map(obj => obj.name));
-}, [scene]);
