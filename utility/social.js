@@ -1,6 +1,7 @@
 import { generateEmbedding } from './embeddings.js';
 import { getPineconeIndex } from '../DB/pineconeDB.js';
 import { INDEX_DB_USER } from '../.devcontainer/config.js';
+import { getDateTime } from './time.js';
 import cron from 'node-cron';
 
 export async function saveUserThreadEmbedding(userinfo, messages, indexName = INDEX_DB_USER, threadId = null) {
