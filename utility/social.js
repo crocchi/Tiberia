@@ -13,7 +13,8 @@ export async function saveUserThreadEmbedding(userinfo, messages, indexName = IN
     const index = await getPineconeIndex(indexName);
 
     await index.upsert([{
-        id: `${chatId}-${userFirstName}@${userUsername}`, // ID unico per ogni messaggio
+        id: `${chatId}-${userFirstName}@${userUsername}`, // ID unico per ogni messaggio    
+        
         values: embedding,
         metadata: { lastUpdate: Date.now(), threadText , threadID: threadId }
     }]);
@@ -32,6 +33,7 @@ function analyzeUser(messages) {
 
 
 // Timer giornaliero alle 00:00
+/*
 cron.schedule('0 0 * * *', async () => {
     console.log("Analisi social utenti a mezzanotte...");
     const socialArray = [];
@@ -52,3 +54,4 @@ cron.schedule('0 0 * * *', async () => {
 }, {
     timezone: "Europe/Rome"
 });
+*/
