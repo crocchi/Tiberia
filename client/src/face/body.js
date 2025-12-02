@@ -3,7 +3,7 @@ import { Canvas } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
 
 function Avatar({ lipsync }) {
-  const { scene } = useGLTF('/models/tiberia.glb'); // metti il tuo modello qui
+  const { scene } = useGLTF('/models/Duck.glb'); // metti il tuo modello qui
   // lipsync: valore tra 0 e 1 per animare la bocca
   // Supponiamo che la mesh della bocca si chiami 'Mouth'
   if (scene.getObjectByName('Mouth')) {
