@@ -10,7 +10,7 @@ export async function loadUserThreadsFromVectorDB() {
         topK: 1000, // o il numero massimo che ti serve
         vector: Array(1536).fill(0), // Dummy vector, serve solo per query globale
         includeMetadata: true,
-        filter: {} // Nessun filtro, prendi tutti
+        filter: { threadID: { "$exists": true } } // Nessun filtro, prendi tutti
     });
 
     if (queryResponse.matches) {
