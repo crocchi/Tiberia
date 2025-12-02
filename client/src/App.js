@@ -1,12 +1,13 @@
+// filepath: /Users/costantinoruggiero/Documents/GitHub/Tiberia/client/src/index.js
 import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App.js';
+import TiberiaFace from './face/body.js';
 
-function App() {
-  return (
-    <div>
-      <h1>Ciao, sono Tiberia!</h1>
-      <h2>Benvenuto nella mia applicazione React.</h2>
-    </div>
-  );
-}
-
-export default App;
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <>
+    <App />
+    <TiberiaFace />
+  </>
+);
