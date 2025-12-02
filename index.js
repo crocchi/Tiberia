@@ -16,7 +16,7 @@ bot.on('location', botOnLocation);
 
 
 // Endpoint di base per i controlli di salute di Render
-app.get('/', (req, res) => {
+app.get('/t', (req, res) => {
   res.send('<h2>Bot Tiberia è attivo!</h2>');
 });
 
@@ -32,7 +32,7 @@ app.listen(port, () => {
 app.use(express.static(path.join(process.cwd(), 'client/build')));
 
 // Qualsiasi altra richiesta manda l'index.html di React
-app.get('/t', (req, res) => {
+app.get('/', (req, res) => {
   res.sendFile(path.join(process.cwd(), 'client/build', 'index.html'));
 });
 
