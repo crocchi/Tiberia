@@ -1,5 +1,5 @@
 //. TIBERIA V.0.0.3
-
+import path from 'path';
 import { app, port, client, assistantId, bot,INDEX_DB_NEWS, INDEX_DB_EVENTS } from './.devcontainer/config.js';
 import { botOnMsg,botOnVoice,botOnLocation } from './telegram.js';
 import cron from 'node-cron';
@@ -27,6 +27,15 @@ app.listen(port, () => {
 //fetchFerryTime();
 //startNewsUpdater()
 
+// Serve i file statici React
+app.use(express.static(path.join(process.cwd(), 'client/build')));
+
+// Qualsiasi altra richiesta manda l'index.html di React
+app.get('*', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'client/build', 'index.html'));
+});
+
+
 /**
  * Avvia il processo di aggiornamento periodico degli eventi.
  */
@@ -39,7 +48,7 @@ function startEventsUpdater() {
 
     // Carica i thread esistenti dal DB vettoriale
     loadUserThreadsFromVectorDB()
-    
+
     // Programma l'esecuzione ogni ora per catturare nuovi eventi durante il giorno
     cron.schedule('30 23 * * *', () => {
         console.log('Esecuzione del task orario per gli eventi.ore 23:30');

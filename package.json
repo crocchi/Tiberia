@@ -4,9 +4,10 @@
   "description": "Ai guide for Capri",
   "main": "index.js",
   "type": "module",
-  "scripts": {
-    "start": "node index.js"
-  },
+ "scripts": {
+  "start": "npm run build-client && node index.js",
+  "build-client": "cd client && npm install && npm run build"
+},
   "keywords": [
     "tiberia",
     "capri",
@@ -24,7 +25,10 @@
     "jsdom": "24.1.0",
     "rss-parser": "3.13.0",
     "node-cron": "^4.2.1",
-    "@pinecone-database/pinecone": "^6.1.3"
+    "@pinecone-database/pinecone": "^6.1.3",
+    "three": "0.152.2",
+    "@react-three/fiber": "9.4.2",
+    "@react-three/drei": "10.7.7"
 
   }
 }
