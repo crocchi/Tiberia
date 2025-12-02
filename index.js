@@ -32,7 +32,7 @@ app.listen(port, () => {
 app.use(express.static(path.join(process.cwd(), 'client/build')));
 
 // Qualsiasi altra richiesta manda l'index.html di React
-app.get('*', (req, res) => {
+app.get('/*', (req, res) => {
   res.sendFile(path.join(process.cwd(), 'client/build', 'index.html'));
 });
 
