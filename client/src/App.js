@@ -1,5 +1,5 @@
 import React from 'react';
-import TiberiaFace from './face/body';
+import TiberiaFace from './face/body.js';
 
 function App() {
   return (

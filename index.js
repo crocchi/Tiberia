@@ -47,8 +47,8 @@ function startEventsUpdater() {
     const updateEnd='2025/12/02';
 
     // inizializza il DB VECTOR startup
-     fetchAndIndexEvents([3,4,5,7],INDEX_DB_NEWS,updateStart,updateEnd,80);//init DB
-    fetchAndIndexEvents([6], INDEX_DB_EVENTS, updateStart,updateEnd,100);//init DB
+   //  fetchAndIndexEvents([3,4,5,7],INDEX_DB_NEWS,updateStart,updateEnd,80);//init DB
+    //fetchAndIndexEvents([6], INDEX_DB_EVENTS, updateStart,updateEnd,100);//init DB
     //fetchAndIndexEvents(categorie scelte,database name,data start, data end, quantita);//init DB eventi odierni
 
     // Carica i thread esistenti dal DB vettoriale
