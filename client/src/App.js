@@ -4,9 +4,12 @@ import TiberiaFace from './face/body.js';
 function App() {
   return (
     <div>
-      <TiberiaFace />
+ 
+      <h2>EnVenUTi?=!</h2>
     </div>
   );
 }
 
 export default App;
+
+//     <TiberiaFace />
