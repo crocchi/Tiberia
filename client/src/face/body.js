@@ -1,9 +1,13 @@
 import React, { useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
 
 function Avatar({ lipsync }) {
   const { scene } = useGLTF('/models/girl.glb');
+  useFrame(() => {
+    scene.rotation.y += 0.01; // ruota il modello
+  });
   return <primitive object={scene} />;
 }
 
