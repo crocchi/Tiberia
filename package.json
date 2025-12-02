@@ -5,8 +5,8 @@
   "main": "index.js",
   "type": "module",
  "scripts": {
-  "start": "npm run build-client && node index.js",
-  "build-client": "cd client && npm install && npm run build"
+  "build-client": "cd client && npm install && npm run build",
+  "start": "npm run build-client && node index.js"
 },
   "keywords": [
     "tiberia",
