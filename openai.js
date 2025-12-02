@@ -15,9 +15,10 @@ export const userThreads = {};
 
 // Funzione helper per processare una richiesta all'assistente
 export async function processAssistantRequest(chatId, inputText, responseType = 'text', userinfo = null) {
-if (userinfo) {
-  const { userFirstName, userUsername } = userinfo;
-}
+  let userFirstName, userUsername;
+  if (userinfo) {
+    ({ userFirstName, userUsername } = userinfo);
+  }
   inputText = `[${getDateTime()}] ${inputText}`
   // 1. Controlla se l'utente è già "occupato"
   if (busyUsers.has(chatId)) {
