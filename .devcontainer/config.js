@@ -29,10 +29,8 @@ if (!token) {
 }
 
 
-const bot = new TelegramBot(token, /*{ polling: true }*/);
-if (!bot.isPolling) {
-    bot.startPolling();
-}
+const bot = new TelegramBot(token, { polling: true });
+
 // --- FINE CONFIGURAZIONE TELEGRAM ---
 
 ///////////SE C R E T W I TH L O V E/////////////
