@@ -13,7 +13,7 @@ export async function saveUserThreadEmbedding(userinfo, messages, indexName = IN
     const index = await getPineconeIndex(indexName);
 
     await index.upsert([{
-        id: `${chatId}@${userUsername}`, // ID unico per ogni messaggio    
+        id: `${chatId}@${userUsername}[${getDateTime()}]`, // ID unico per ogni messaggio
 
         values: embedding,
         metadata: { lastUpdate: Date.now(), threadText , threadID: threadId }

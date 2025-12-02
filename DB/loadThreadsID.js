@@ -15,7 +15,7 @@ export async function loadUserThreadsFromVectorDB() {
 
     if (queryResponse.matches) {
         queryResponse.matches.forEach(match => {
-            const cleaned = match.id.replace(/@\w+/, '');
+            const cleaned = match.id.replace(/@.*?(?=\[]|$)/, '');
             const chatId = cleaned;
             const threadId = match.metadata.threadID;
             if (chatId && threadId) {
