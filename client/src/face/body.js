@@ -38,7 +38,7 @@ export default function TiberiaFace({ audioSrc }) {
         <ambientLight />
         <Avatar lipsync={lipsync} />
       </Canvas>
-      <h2>Ciao, sono Tiberia!</h2>
+      <h2>Ciao, sono Tiberia!??</h2>
       <audio ref={audioRef} src={audioSrc} />
       <button onClick={handlePlay}>Parla!</button>
     </div>
