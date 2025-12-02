@@ -4,7 +4,6 @@ import TiberiaFace from './face/body.js';
 function App() {
   return (
     <div>
-      <h1>Ciao!</h1>
       <TiberiaFace />
     </div>
   );

@@ -13,8 +13,13 @@ export async function loadUserThreadsFromVectorDB() {
         filter: { threadID: { "$exists": true } } // Nessun filtro, prendi tutti
     });
 
+    let nicknames=[]
     if (queryResponse.matches) {
         queryResponse.matches.forEach(match => {
+            //585151280@Crocchii[02/12/2025 15:03:27]
+            const nicknameMatch = match.id.match(/@(.*?)(?=\[|$)/);
+            const nickname = nicknameMatch ? nicknameMatch[1] : null;
+            nicknames.push(nickname);
             const cleaned = match.id.replace(/@.*?(?=\[]|$)/, '');
             const chatId = cleaned;
             const threadId = match.metadata.threadID;
@@ -23,6 +28,7 @@ export async function loadUserThreadsFromVectorDB() {
             }
         });
         console.log("userThreads popolato da Pinecone:", userThreads);
+        console.log("Nicknames estratti:", nicknames.join(', '));
         return userThreads;
     }
 
