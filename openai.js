@@ -35,7 +35,7 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
   typeOfResponse = typeOfResponse === 'voice' ? 'record_voice' : 'typing';
   let typingInterval = setInterval(() => {
     bot.sendChatAction(chatId, typeOfResponse);
-  }, 4000);
+  }, 4500);
 
 
   try {
