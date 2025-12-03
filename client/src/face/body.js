@@ -7,7 +7,7 @@ function Avatar({ lipsync }) {
   const { scene } = useGLTF('/models/girl.glb');
 
 React.useEffect(() => {
-    console.log(scene.children.map(obj => obj.name));
+    console.log(scene.children.map(obj => obj));
   }, [scene]);
 
 
