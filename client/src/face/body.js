@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { useGLTF, OrbitControls } from '@react-three/drei';
+import { useGLTF, OrbitControls, useTexture } from '@react-three/drei';  // Aggiungi useTexture
 import { useFrame } from '@react-three/fiber';
 
 // Muovere il modello 3D con le gesture da mobile (es. ruotare, zoomare, spostare con il dito)
@@ -10,8 +10,12 @@ const avatar = ['/models/Duck.glb', '/models/Dayo.glb', '/models/girl.glb', '/mo
 function Avatar({ lipsync }) {
   const { scene } = useGLTF(avatar[1]);
   const [rot, setRot] = useState(0);
-  const blinkState = useRef({ nextBlink: 0, closing: false, t: 0 });
+  const blinkState = useRef({ nextBlink: 0, closing: false });
   const group = useRef();
+
+  // Carica le texture per gli occhi (adatta i path alle tue immagini)
+  const eyesOpenTexture = useTexture('/models/textures/gltf_embedded_10.jpeg');  // Texture occhi aperti
+  const eyesClosedTexture = useTexture('/models/textures/gltf_embedded_10.jpeg');  // Texture occhi chiusi
 
   // Posizione avatar nel frame
   scene.position.x = 0;
@@ -33,18 +37,17 @@ function Avatar({ lipsync }) {
     });
   }, [scene]);
 
-  // Forza visibilità degli occhi (EyesNode)
+  // Forza visibilità degli occhi (EyesNode) e applica texture iniziale
   React.useEffect(() => {
     const eyesNode = scene.getObjectByName('EyesNode');
-    if (eyesNode) {
+    if (eyesNode && eyesNode.material) {
       eyesNode.visible = true;
-      if (eyesNode.material) {
-        eyesNode.material.transparent = false;
-        eyesNode.material.opacity = 1;
-        // Forza bianco se necessario (ma dal JSON, il materiale è già definito)
-      }
+      eyesNode.material.transparent = false;
+      eyesNode.material.opacity = 1;
+      eyesNode.material.map = eyesOpenTexture;  // Inizia con occhi aperti
+      eyesNode.material.needsUpdate = true;
     }
-  }, [scene]);
+  }, [scene, eyesOpenTexture]);
 
   useFrame((state, delta) => {
     // Oscillazione laterale (dondolio)
@@ -52,32 +55,21 @@ function Avatar({ lipsync }) {
       group.current.rotation.z = Math.sin(state.clock.getElapsedTime() * 1) * 0.02;
     }
 
-    // Blinking occhi: anima i bone LeftEye e RightEye (non la mesh EyesNode)
+    // Blinking occhi: cambia texture invece di animare bone
     const eyesNode = scene.getObjectByName('EyesNode');
     const now = state.clock.getElapsedTime();
     if (now > blinkState.current.nextBlink) {
       blinkState.current.closing = true;
-      blinkState.current.t = 0;
-      blinkState.current.nextBlink = now + 2 + Math.random() * 3; // prossimo blink tra 2-5 sec
-    }
-
-    if (blinkState.current.closing) {
-      blinkState.current.t += delta * 5;
-      const blink = Math.max(-0.5, 0 - blinkState.current.t); // Ruota per chiudere (valore negativo per rotazione verso il basso)
-      if (eyesNode && eyesNode.skeleton) {
-        const leftEyeBone = eyesNode.skeleton.bones.find(b => b.name.toLowerCase().includes('lefteye'));
-        const rightEyeBone = eyesNode.skeleton.bones.find(b => b.name.toLowerCase().includes('righteye'));
-        if (leftEyeBone) leftEyeBone.rotation.x = blink; // Anima rotazione X per chiudere/aprire
-        if (rightEyeBone) rightEyeBone.rotation.x = blink;
+      blinkState.current.nextBlink = now + 2 + Math.random() * 3;  // Prossimo blink tra 2-5 sec
+      if (eyesNode && eyesNode.material) {
+        eyesNode.material.map = eyesClosedTexture;  // Chiudi occhi
+        eyesNode.material.needsUpdate = true;
       }
-      if (blink <= -0.5) blinkState.current.closing = false;
-    } else {
-      // Riapri gli occhi
-      if (eyesNode && eyesNode.skeleton) {
-        const leftEyeBone = eyesNode.skeleton.bones.find(b => b.name.toLowerCase().includes('lefteye'));
-        const rightEyeBone = eyesNode.skeleton.bones.find(b => b.name.toLowerCase().includes('righteye'));
-        if (leftEyeBone) leftEyeBone.rotation.x = 0; // Rotazione neutra
-        if (rightEyeBone) rightEyeBone.rotation.x = 0;
+    } else if (blinkState.current.closing && now > blinkState.current.nextBlink - 0.2) {  // Riapri dopo 0.2 sec
+      blinkState.current.closing = false;
+      if (eyesNode && eyesNode.material) {
+        eyesNode.material.map = eyesOpenTexture;  // Riapri occhi
+        eyesNode.material.needsUpdate = true;
       }
     }
   });
