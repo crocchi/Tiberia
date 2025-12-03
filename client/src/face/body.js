@@ -4,7 +4,7 @@ import { useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 
 function Avatar({ lipsync }) {
-  const { scene } = useGLTF('/models/girl.glb');
+  const { scene } = useGLTF('/models/Predator_s.glb');
 
 React.useEffect(() => {
     console.log(scene.children.map(obj => obj));
