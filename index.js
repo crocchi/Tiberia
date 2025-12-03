@@ -17,7 +17,7 @@ bot.on('location', botOnLocation);
 
 
 // Endpoint di base per i controlli di salute di Render
-app.get('/t', (req, res) => {
+app.get('/', (req, res) => {
   res.send('<h2>Bot Tiberia è attivo!</h2>');
 });
 
@@ -38,6 +38,8 @@ app.set('views', path.join(process.cwd(), 'views'));
 app.get('/tiberia', (req, res) => {
   res.render('hello', { name: 'Tiberia' });
 });
+// Servi file statici dalla cartella models
+app.use('/models', express.static(path.join(process.cwd(), 'models')));
 
 
 /**
