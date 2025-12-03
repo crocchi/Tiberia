@@ -17,8 +17,12 @@ bot.on('location', botOnLocation);
 
 
 // Endpoint di base per i controlli di salute di Render
-app.get('/', (req, res) => {
+app.get('/t', (req, res) => {
   res.send('<h2>Bot Tiberia è attivo!</h2>');
+});
+
+app.get('/', (req, res) => {
+  res.render('face');
 });
 
 // Avvia il server
@@ -40,6 +44,7 @@ app.get('/tiberia', (req, res) => {
 });
 // Servi file statici dalla cartella models
 app.use('/models', express.static(path.join(process.cwd(), 'models')));
+
 
 
 /**
