@@ -15,7 +15,7 @@ function Avatar({ lipsync }) {
 
   // Carica le texture per gli occhi (adatta i path alle tue immagini)
   const eyesOpenTexture = useTexture('/models/textures/gltf_embedded_10.jpeg');  // Texture occhi aperti
-  const eyesClosedTexture = useTexture('/models/textures/gltf_embedded_10.jpeg');  // Texture occhi chiusi
+  const eyesClosedTexture = useTexture('/models/textures/gltf_embedded_4.jpeg');  // Texture occhi chiusi
 
   // Posizione avatar nel frame
   scene.position.x = 0;
