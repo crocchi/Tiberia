@@ -6,10 +6,10 @@ import { useFrame } from '@react-three/fiber';
 // Muovere il modello 3D con le gesture da mobile (es. ruotare, zoomare, spostare con il dito)
 
 const avatar = ['/models/Duck.glb', '/models/Dayo.glb', '/models/girl.glb',
-   '/models/CesiumMan.glb', '/models/Emi.glb'];
+   '/models/CesiumMan.glb', '/models/Emi.glb', '/models/best.glb'];
 
 function Avatar({ lipsync }) {
-  const { scene } = useGLTF(avatar[1]);
+  const { scene } = useGLTF(avatar[5]);
   const [rot, setRot] = useState(0);
   const blinkState = useRef({ nextBlink: 0, closing: false });
   const lipState = useRef({ t: 0, opening: true });  // Stato per movimento labbra simulato
