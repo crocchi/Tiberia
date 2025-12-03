@@ -5,12 +5,15 @@ import { useFrame } from '@react-three/fiber';
 
 function Avatar({ lipsync }) {
   const { scene } = useGLTF('/models/girl.glb');
-  
+
 useFrame(() => {
   const mouth = scene.getObjectByName('Mouth');
   if (mouth && mouth.morphTargetInfluences) {
     mouth.morphTargetInfluences[0] = Math.abs(Math.sin(Date.now() * 0.005));
   }
+  React.useEffect(() => {
+  console.log(scene.children.map(obj => obj.name));
+}, [scene]);
 });
 
   return <primitive object={scene} />;
