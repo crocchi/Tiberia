@@ -10,12 +10,14 @@
 <script type="module">
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.164/build/three.module.js";
 import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.164/examples/jsm/loaders/GLTFLoader.js";
+import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.164/examples/jsm/controls/OrbitControls.js";
 
 let scene, camera, renderer, mixer;
 let bust, jawIndex = null;
 
 // ==== SETUP BASE ====
 scene = new THREE.Scene();
+scene.background = new THREE.Color(0x222222);
 camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 100);
 camera.position.set(0, 1.5, 2);
 
@@ -23,9 +25,19 @@ renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// LUCI
-const light = new THREE.HemisphereLight(0xffffff, 0x444444, 1.2);
-scene.add(light);
+// Lights
+const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.2);
+hemiLight.position.set(0, 20, 0);
+scene.add(hemiLight);
+
+const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+dirLight.position.set(3, 10, 10);
+scene.add(dirLight);
+
+// Controls
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 1, 0);
+controls.update();
 
 // ======= CARICA MODELLO =======
 const loader = new GLTFLoader();
@@ -40,20 +52,9 @@ loader.load("https://tiberia.onrender.com/models/best.glb", (gltf) => {
 
 // ======= LOOP ANIMAZIONE =======
 function animate() {
-    requestAnimationFrame(animate);
-
-    if (bust && analyser && jawIndex !== null) {
-        const volume = analyser.getAverageFrequency() / 255;
-
-        // Anima apertura della mandibola (JawOpen)
-        bust.traverse(obj => {
-            if (obj.isMesh && obj.morphTargetInfluences) {
-                obj.morphTargetInfluences[jawIndex] = volume * 1.2; // amplificazione
-            }
-        });
-    }
-
-    renderer.render(scene, camera);
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
 }
 
 animate();
