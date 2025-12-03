@@ -17,10 +17,19 @@ function Avatar({ lipsync }) {
     scene.scale.x=7
     scene.scale.y=7
     scene.scale.z=1
-    
+
+     //scegli elementi modello
+    const eyes = scene.getObjectByName('EyesNode');
   useFrame(() => {
-    scene.rotation.y = rot;
-  });
+  // Simula il blinking (apertura/chiusura occhi)
+  if (eyes) {
+    // Valore tra 0.3 (chiuso) e 1 (aperto)
+    const blink = 0.7 + 0.3 * Math.abs(Math.sin(Date.now() * 0.002));
+    eyes.scale.y = blink;
+  }
+  scene.rotation.y = rot;
+});
+
 
   console.log(scene);
 return (
