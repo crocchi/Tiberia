@@ -1,2 +1,1 @@
-   // "@openai/agents": "^0.3.3",
-   // "zod": "^3.25.40",
+children[0].children[3].skeleton.bones
