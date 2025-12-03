@@ -3,8 +3,10 @@ import { Canvas } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 
+const avatar=['/models/Duck.glb','/models/Dayo.glb']
+
 function Avatar({ lipsync }) {
-  const { scene } = useGLTF('/models/Duck.glb');
+  const { scene } = useGLTF(avatar[1]);
   const [rot, setRot] = useState(0);
 
   useFrame(() => {
