@@ -6,6 +6,7 @@ import { botOnMsg,botOnVoice,botOnLocation } from './telegram.js';
 import cron from 'node-cron';
 import { fetchAndIndexEvents } from './utility/capri-events.js';
 import { loadUserThreadsFromVectorDB } from './DB/loadThreadsID.js';
+import ejs from 'ejs';
 
 
 
@@ -28,12 +29,14 @@ app.listen(port, () => {
 //fetchFerryTime();
 //startNewsUpdater()
 
-// Serve i file statici React
-app.use(express.static(path.join(process.cwd(), 'client/build')));
 
-// Qualsiasi altra richiesta manda l'index.html di React
-app.get('/', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'client/build', 'index.html'));
+// Imposta EJS come view engine
+app.set('view engine', 'ejs');
+app.set('views', path.join(process.cwd(), 'views'));
+
+// Esempio endpoint che usa EJS
+app.get('/tiberia', (req, res) => {
+  res.render('hello', { name: 'Tiberia' });
 });
 
 

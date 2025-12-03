@@ -23,14 +23,8 @@ function FaceModel(props) {
   const eyeOpen = useRef(true)
   let eyeTimer = useRef(0)
 
-  let position={
-    "x": 0,
-    "y": -2,
-    "z": 2
-}
-  scene.position.x = 0;
-  scene.position.y = -2;
-  scene.position.z = 2;
+  // Posizione scena
+  scene.position.set(0, -2, 2)
 
   // Stato per animazione bocca
   const mouthValue = useRef(0)
@@ -54,8 +48,7 @@ function FaceModel(props) {
     if (mouth) mouth.scale.y = 1 + mouthValue.current * 0.5
   })
 
-  // Posizione scena
-  scene.position.set(0, -2, 2)
+
 
   return <primitive ref={group} object={scene} {...props} />
 }
@@ -65,6 +58,7 @@ export default function FaceScene() {
     <Canvas camera={{ position: [0, 0, 5] }}>
       <ambientLight />
       <FaceModel />
+      <OrbitControls enablePan={true} enableZoom={true} enableRotate={true} />
     </Canvas>
   )
 }
