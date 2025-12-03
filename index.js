@@ -22,8 +22,9 @@ app.get('/t', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.render('tiberia');
+  res.render('face');
 });
+
 
 // Avvia il server
 app.listen(port, () => {

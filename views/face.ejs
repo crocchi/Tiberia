@@ -1,79 +1,84 @@
-<!-- filepath: /Users/costantinoruggiero/Documents/GitHub/Tiberia/views/face.ejs -->
 <!DOCTYPE html>
-<html lang="it">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Animazione Spongebob - Mezzo Busto</title>
+<html>
+<head>
+    <title>Three.js Lip Sync</title>
     <style>
-      html, body, canvas { height: 100%; margin: 0; padding: 0; overflow: hidden; }
+        body { margin: 0; overflow: hidden; background: #000; }
     </style>
-  </head>
-  <body>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+<script type="module">
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.164/build/three.module.js";
+import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.164/examples/jsm/loaders/GLTFLoader.js";
 
-    <script>
-     // Inizializza scena, camera, renderer
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer();
+let scene, camera, renderer, mixer;
+let bust, jawIndex = null;
+
+// ==== SETUP BASE ====
+scene = new THREE.Scene();
+camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 100);
+camera.position.set(0, 1.5, 2);
+
+renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-console.log('sei qui dentro....')
-// Luce ambientale
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-scene.add(ambientLight);
+// LUCI
+const light = new THREE.HemisphereLight(0xffffff, 0x444444, 1.2);
+scene.add(light);
 
-// Carica il modello GLB
-const loader = new THREE.GLTFLoader();
-let model, leftEye, rightEye;
-loader.load('/models/spongebob.glb', function (gltf) {
-  model = gltf.scene;
-  scene.add(model);
+// ======= CARICA MODELLO =======
+const loader = new GLTFLoader();
+loader.load("https://tiberia.onrender.com/models/Dayo.glb", (gltf) => {
+    bust = gltf.scene;
+    bust.position.y = -1;
+    scene.add(bust);
 
-  // Trova i mesh degli occhi (modifica i nomi se diversi)
-  leftEye = model.getObjectByName('Left_Eye');
-  rightEye = model.getObjectByName('Right_Eye');
-
-  // Posizione e scala per mezzo busto (centra e ridimensiona)
-  model.position.set(0, -2, 2);
-  model.scale.set(1.5, 1.5, 1.5);
-}, undefined, function (error) {
-  console.error(error);
+    // Trova index del morph target "JawOpen"
+    bust.traverse(obj => {
+        if (obj.isMesh && obj.morphTargetDictionary) {
+            jawIndex = obj.morphTargetDictionary["JawOpen"];
+        }
+    });
 });
 
-// Controlli per mobile (ruota, zoom, sposta con dito)
-const controls = new THREE.OrbitControls(camera, renderer.domElement);
-controls.enablePan = true;
-controls.enableZoom = true;
-controls.enableRotate = true;
+// ======= AUDIO + ANALISI =======
+const listener = new THREE.AudioListener();
+camera.add(listener);
 
-// Animazione occhi (apri/chiudi naturale con sinusoide)
-let time = 0;
+const audio = new THREE.Audio(listener);
+const audioLoader = new THREE.AudioLoader();
+
+let analyser;
+
+audioLoader.load("voice.mp3", (buffer) => {
+    audio.setBuffer(buffer);
+    audio.setLoop(true);
+    audio.play();
+
+    analyser = new THREE.AudioAnalyser(audio, 32);
+});
+
+// ======= LOOP ANIMAZIONE =======
 function animate() {
-  requestAnimationFrame(animate);
-  time += 0.01; // Velocità animazione
+    requestAnimationFrame(animate);
 
-  // Occhi: scala Y oscillante tra 0.1 (chiuso) e 1 (aperto), naturale
-  if (leftEye && rightEye) {
-    const eyeScale = 0.55 + 0.45 * Math.sin(time * 2); // Ciclo lento, naturale
-    leftEye.scale.y = eyeScale;
-    rightEye.scale.y = eyeScale;
-  }
+    if (bust && analyser && jawIndex !== null) {
+        const volume = analyser.getAverageFrequency() / 255;
 
-  controls.update();
-  renderer.render(scene, camera);
+        // Anima apertura della mandibola (JawOpen)
+        bust.traverse(obj => {
+            if (obj.isMesh && obj.morphTargetInfluences) {
+                obj.morphTargetInfluences[jawIndex] = volume * 1.2; // amplificazione
+            }
+        });
+    }
+
+    renderer.render(scene, camera);
 }
+
 animate();
 
-// Ridimensiona canvas su resize finestra
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-});
-    </script>
-  </body>
+</script>
+</body>
 </html>
