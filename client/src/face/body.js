@@ -20,6 +20,7 @@ function Avatar({ lipsync }) {
   scene.scale.x = 7;
   scene.scale.y = 7;
   scene.scale.z = 7; // Cambiato a 7 per renderlo più 3D (non piatto)
+  console.log('Avatar loaded:', scene);
 
   React.useEffect(() => {
     scene.traverse(obj => {
