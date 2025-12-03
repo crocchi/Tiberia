@@ -10,14 +10,12 @@ React.useEffect(() => {
     console.log(scene.children.map(obj => obj));
   }, [scene]);
 
-
 useFrame(() => {
   const mouth = scene.getObjectByName('Mouth');
   if (mouth && mouth.morphTargetInfluences) {
     mouth.morphTargetInfluences[0] = Math.abs(Math.sin(Date.now() * 0.005));
-  }});
-
-  return <primitive object={scene} />;
+  }
+});
 }
 
 export default function TiberiaFace({ audioSrc }) {
