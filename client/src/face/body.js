@@ -6,7 +6,7 @@ import { useFrame } from '@react-three/fiber';
 // Muovere il modello 3D con le gesture da mobile (es. ruotare, zoomare, spostare con il dito)
 
 const avatar = ['/models/Duck.glb', '/models/Dayo.glb', '/models/girl.glb',
-   '/models/CesiumMan.glb', '/models/Emi.glb', '/models/best.glb'];
+   '/models/CesiumMan.glb', '/models/Emi.glb', '/models/best.glb', '/models/spongebob.glb'];
 
 function Avatar({ lipsync }) {
   const { scene } = useGLTF(avatar[5]);
