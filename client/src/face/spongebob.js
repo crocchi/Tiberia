@@ -17,17 +17,20 @@ function FaceModel(props) {
   // Trova i mesh degli occhi e della bocca (modifica i nomi secondo il tuo modello)
   const leftEye = nodes['Left_Eye'] // oppure nodes['Object_XXX']
   const rightEye = nodes['Right_Eye']
-  const mouth = nodes['Mouth']
+  const mouth = nodes['Upper_Lip_08']
 
   // Stato per animazione occhi
   const eyeOpen = useRef(true)
   let eyeTimer = useRef(0)
 
-  letposition={
+  let position={
     "x": 0,
     "y": -2,
     "z": 2
 }
+  scene.position.x = 0;
+  scene.position.y = -2;
+  scene.position.z = 2;
 
   // Stato per animazione bocca
   const mouthValue = useRef(0)
