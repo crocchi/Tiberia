@@ -11,6 +11,7 @@ function Avatar({ lipsync }) {
   const { scene } = useGLTF(avatar[1]);
   const [rot, setRot] = useState(0);
   const blinkState = useRef({ nextBlink: 0, closing: false });
+  const lipState = useRef({ t: 0, opening: true });  // Stato per movimento labbra simulato
   const group = useRef();
 
   // Carica le texture per gli occhi (adatta i path alle tue immagini)
@@ -24,6 +25,21 @@ function Avatar({ lipsync }) {
   scene.scale.x = 7;
   scene.scale.y = 7;
   scene.scale.z = 7;
+  console.log('Avatar scene loaded:', scene);
+
+  // Trova mesh con morph targets per la bocca
+  const mouthMesh = useRef(null);
+  React.useEffect(() => {
+    scene.traverse(obj => {
+      if (obj.isMesh && obj.morphTargetInfluences && obj.morphTargetDictionary) {
+        console.log('Mesh with morph targets:', obj.name, obj.morphTargetDictionary);
+        // Cerca morph per bocca (adatta il nome se diverso, es. "mouthOpen", "jawOpen")
+        if (obj.morphTargetDictionary['mouthOpen'] !== undefined) {
+          mouthMesh.current = obj;
+        }
+      }
+    });
+  }, [scene]);
 
   // Forza visibilità degli occhi (EyesNode) e applica texture iniziale
   React.useEffect(() => {
@@ -59,6 +75,17 @@ function Avatar({ lipsync }) {
         eyesNode.material.map = eyesOpenTexture;  // Riapri occhi
         eyesNode.material.needsUpdate = true;
       }
+    }
+
+    // Movimento labbra simulato (senza audio, solo esempio ciclico)
+    if (mouthMesh.current) {
+      lipState.current.t += delta * 2;  // Velocità movimento
+      if (lipState.current.t > 1) {
+        lipState.current.t = 0;
+        lipState.current.opening = !lipState.current.opening;
+      }
+      const mouthValue = lipState.current.opening ? lipState.current.t : 1 - lipState.current.t;  // Apri/chiudi ciclico
+      mouthMesh.current.morphTargetInfluences[mouthMesh.current.morphTargetDictionary['mouthOpen']] = mouthValue;
     }
   });
 

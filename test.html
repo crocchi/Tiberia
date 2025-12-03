@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dayo Avatar Test</title>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; text-align: center; }
+    canvas { display: block; margin: 0 auto; }
+  </style>
+</head>
+<body>
+  <h2>Ciao, sono Tiberia!!</h2>
+  <div id="container"></div>
+  <audio id="audio" controls src="path/to/your/audio.mp3" crossorigin="anonymous"></audio>  <!-- Sostituisci con URL audio valido -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+  <script>
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.getElementById('container').appendChild(renderer.domElement);
+
+    // Luci
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(10, 10, 5);
+    scene.add(directionalLight);
+
+    // Camera
+    camera.position.z = 5;
+
+    // Controlli (opzionali, per zoom/ruota)
+    const controls = { enablePan: true, enableZoom: true, enableRotate: true };  // Simulato, usa OrbitControls se aggiungi script
+
+    // Carica modello GLB
+    const loader = new THREE.GLTFLoader();
+    let avatarScene, eyesNode, mouthMesh;
+    loader.load('client/public/models/Dayo.glb', function (gltf) {
+      avatarScene = gltf.scene;
+      avatarScene.position.set(0, -10.5, 2);
+      avatarScene.scale.set(7, 7, 7);
+      scene.add(avatarScene);
+
+      // Trova EyesNode e mesh bocca
+      avatarScene.traverse(obj => {
+        if (obj.isMesh) {
+          console.log('Mesh:', obj.name);
+          if (obj.name === 'EyesNode') eyesNode = obj;
+          if (obj.morphTargetInfluences && obj.morphTargetDictionary) {
+            console.log('Morph targets:', obj.morphTargetDictionary);
+            if (obj.morphTargetDictionary['mouthOpen'] !== undefined) mouthMesh = obj;  // Adatta nome se diverso
+          }
+        }
+      });
+
+      // Carica texture occhi
+      const textureLoader = new THREE.TextureLoader();
+      const eyesOpenTexture = textureLoader.load('/models/textures/gltf_close.jpeg');
+      const eyesClosedTexture = textureLoader.load('/models/textures/gltf_embedded_10.jpeg');
+
+      if (eyesNode) {
+        eyesNode.material.map = eyesOpenTexture;
+        eyesNode.material.needsUpdate = true;
+      }
+
+      // Setup audio per lipsync
+      const audio = document.getElementById('audio');
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const analyser = audioContext.createAnalyser();
+      analyser.fftSize = 256;
+      const source = audioContext.createMediaElementSource(audio);
+      source.connect(analyser);
+      analyser.connect(audioContext.destination);
+      const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+      // Stato blinking
+      let blinkState = { nextBlink: 0, closing: false };
+
+      // Animazione
+      function animate() {
+        requestAnimationFrame(animate);
+        const now = performance.now() / 1000;
+
+        // Oscillazione laterale
+        if (avatarScene) avatarScene.rotation.z = Math.sin(now * 1) * 0.02;
+
+        // Blinking occhi
+        if (now > blinkState.nextBlink) {
+          blinkState.closing = true;
+          blinkState.nextBlink = now + 2 + Math.random() * 3;
+          if (eyesNode) {
+            eyesNode.material.map = eyesClosedTexture;
+            eyesNode.material.needsUpdate = true;
+          }
+        } else if (blinkState.closing && now > blinkState.nextBlink - 0.2) {
+          blinkState.closing = false;
+          if (eyesNode) {
+            eyesNode.material.map = eyesOpenTexture;
+            eyesNode.material.needsUpdate = true;
+          }
+        }
+
+        // Lipsync
+        if (mouthMesh) {
+          analyser.getByteFrequencyData(dataArray);
+          const avg = dataArray.reduce((a, b) => a + b) / dataArray.length;
+          const mouthOpenValue = Math.min(1, avg / 128);
+          mouthMesh.morphTargetInfluences[mouthMesh.morphTargetDictionary['mouthOpen']] = mouthOpenValue;
+        }
+
+        renderer.render(scene, camera);
+      }
+      animate();
+    }, undefined, function (error) {
+      console.error('Errore caricamento GLB:', error);
+    });
+
+    // Resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
