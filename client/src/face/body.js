@@ -5,8 +5,7 @@ import { useFrame } from '@react-three/fiber';
 
 // Muovere il modello 3D con le gesture da mobile (es. ruotare, zoomare, spostare con il dito)
 
-const avatar = ['/models/Duck.glb', '/models/Dayo.glb',
-   '/models/girl.glb', '/models/CesiumMan.glb', '/models/Emi.glb'];
+const avatar = ['/models/Duck.glb', '/models/Dayo.glb', '/models/girl.glb', '/models/CesiumMan.glb', '/models/Emi.glb'];
 
 function Avatar({ lipsync }) {
   const { scene } = useGLTF(avatar[1]);
@@ -20,17 +19,21 @@ function Avatar({ lipsync }) {
   scene.position.z = 2;
   scene.scale.x = 7;
   scene.scale.y = 7;
-  scene.scale.z = 1;
+  scene.scale.z = 7; // Cambiato a 7 per renderlo più 3D (non piatto)
 
   React.useEffect(() => {
     scene.traverse(obj => {
       if (obj.isMesh) {
         console.log('Mesh:', obj.name);
+        // Controlla se EyesNode ha morph targets per blinking avanzato
+        if (obj.name === 'EyesNode' && obj.morphTargetInfluences) {
+          console.log('Morph targets per EyesNode:', obj.morphTargetDictionary);
+        }
       }
     });
   }, [scene]);
 
-  // Forza visibilità degli occhi (EyesNode)
+  // Forza visibilità degli occhi (EyesNode) - rimosso debug color per vedere il nero originale
   React.useEffect(() => {
     const eyesNode = scene.getObjectByName('EyesNode');
     if (eyesNode) {
@@ -38,7 +41,7 @@ function Avatar({ lipsync }) {
       if (eyesNode.material) {
         eyesNode.material.transparent = false;
         eyesNode.material.opacity = 1;
-        eyesNode.material.color.set('blue'); // Debug: cambia colore per vedere se appaiono
+        // Rimosso obj.material.color.set('blue') per vedere il colore originale (nero)
       }
     }
   }, [scene]);
@@ -49,7 +52,7 @@ function Avatar({ lipsync }) {
       group.current.rotation.z = Math.sin(state.clock.getElapsedTime() * 1) * 0.02;
     }
 
-    // Blinking occhi (anima la scala Y di EyesNode per chiudere/aprire)
+    // Blinking occhi (anima la posizione Y di EyesNode per farli "sparire" dietro la testa)
     const eyesNode = scene.getObjectByName('EyesNode');
     const now = state.clock.getElapsedTime();
     if (now > blinkState.current.nextBlink) {
@@ -60,11 +63,11 @@ function Avatar({ lipsync }) {
 
     if (blinkState.current.closing) {
       blinkState.current.t += delta * 5;
-      const blink = Math.max(0.2, 1 - blinkState.current.t); // chiude velocemente
-      if (eyesNode) eyesNode.scale.y = blink; // Anima scala Y per chiudere gli occhi
-      if (blink <= 0.2) blinkState.current.closing = false;
+      const blink = Math.max(-0.1, 0 - blinkState.current.t); // Sposta giù per chiudere
+      if (eyesNode) eyesNode.position.y = blink; // Anima posizione Y per chiudere gli occhi
+      if (blink <= -0.1) blinkState.current.closing = false;
     } else {
-      if (eyesNode) eyesNode.scale.y = 1; // Riapri gli occhi
+      if (eyesNode) eyesNode.position.y = 0; // Riapri gli occhi (posizione originale)
     }
 
     // Opzionale: anima i bone degli occhi per movimento (se vuoi)
@@ -85,7 +88,8 @@ export default function TiberiaFace({ audioSrc }) {
   return (
     <div style={{ textAlign: 'center', margin: '2rem' }}>
       <Canvas style={{ height: 300 }}>
-        <ambientLight />
+        <ambientLight intensity={0.5} />
+        <directionalLight position={[10, 10, 5]} intensity={1} /> {/* Aggiunta luce per profondità 3D */}
         <Avatar lipsync={0} />
         <OrbitControls enablePan={true} enableZoom={true} enableRotate={true} />
       </Canvas>
