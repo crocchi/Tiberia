@@ -1,7 +1,7 @@
-import React, { useRef, useState } from 'react';
-import { Canvas } from '@react-three/fiber';
+import React, { useRef, useEffect } from 'react'
+import { Canvas, useFrame } from '@react-three/fiber'
+import { useGLTF } from '@react-three/drei'
 import { useGLTF, OrbitControls, useTexture } from '@react-three/drei';  // Aggiungi useTexture
-import { useFrame } from '@react-three/fiber';
 
 // Muovere il modello 3D con le gesture da mobile (es. ruotare, zoomare, spostare con il dito)
 
@@ -9,9 +9,7 @@ const avatar = ['/models/Duck.glb', '/models/Dayo.glb', '/models/girl.glb',
    '/models/CesiumMan.glb', '/models/Emi.glb', '/models/best.glb', '/models/spongebob.glb'];
 
 
-   import React, { useRef, useEffect } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
-import { useGLTF } from '@react-three/drei'
+
 
 function FaceModel(props) {
   const group = useRef()
