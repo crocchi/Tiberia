@@ -5,11 +5,13 @@ import { useFrame } from '@react-three/fiber';
 
 function Avatar({ lipsync }) {
   const { scene } = useGLTF('/models/Duck.glb');
-  React.useEffect(() => {
-  console.log(scene.children.map(obj => obj.name));
-}, [scene]);
+  const [rot, setRot] = useState(0);
 
-console.log(scene);
+  useFrame(() => {
+    scene.rotation.y = rot;
+  });
+
+  console.log(scene);
 
 }
 
