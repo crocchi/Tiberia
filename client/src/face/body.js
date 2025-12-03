@@ -9,6 +9,15 @@ function Avatar({ lipsync }) {
   const { scene } = useGLTF(avatar[1]);
   const [rot, setRot] = useState(0);
 
+  //posizione avatar nel frame
+    scene.position.x=0
+    scene.position.y=-10.5
+    scene.position.z=2
+
+    scene.scale.x=7
+    scene.scale.y=7
+    scene.scale.z=1
+    
   useFrame(() => {
     scene.rotation.y = rot;
   });
@@ -34,3 +43,27 @@ export default function TiberiaFace({ audioSrc }) {
   );
 }
 
+/*
+   scene.rotation.y += 0.01; // rotazione continua
+    t.current += delta;
+    scene.position.y = Math.sin(t.current * 2) * 0.2; // oscillazione verticale
+
+
+    //posizione avatar nel frame
+    scene.position.x=0
+    scene.position.y=-10.5
+    scene.position.z=2
+
+    scene.scale.x=7
+    scene.scale.y=7
+    scene.scale.z=1
+
+    //scegli elementi modello
+    const eyes = scene.getObjectByName('EyesNode');
+
+
+    const mouth = scene.getObjectByName('Mouth');
+    if (mouth && mouth.morphTargetInfluences) {
+      mouth.morphTargetInfluences[0] = Math.abs(Math.sin(Date.now() * 0.005));
+    }
+*/
