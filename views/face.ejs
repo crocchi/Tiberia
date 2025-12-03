@@ -29,35 +29,14 @@ scene.add(light);
 
 // ======= CARICA MODELLO =======
 const loader = new GLTFLoader();
-loader.load("https://tiberia.onrender.com/models/Dayo.glb", (gltf) => {
+loader.load("https://tiberia.onrender.com/models/best.glb", (gltf) => {
     bust = gltf.scene;
     bust.position.y = -1;
     scene.add(bust);
 
-    // Trova index del morph target "JawOpen"
-    bust.traverse(obj => {
-        if (obj.isMesh && obj.morphTargetDictionary) {
-            jawIndex = obj.morphTargetDictionary["JawOpen"];
-        }
-    });
+ 
 });
 
-// ======= AUDIO + ANALISI =======
-const listener = new THREE.AudioListener();
-camera.add(listener);
-
-const audio = new THREE.Audio(listener);
-const audioLoader = new THREE.AudioLoader();
-
-let analyser;
-
-audioLoader.load("voice.mp3", (buffer) => {
-    audio.setBuffer(buffer);
-    audio.setLoop(true);
-    audio.play();
-
-    analyser = new THREE.AudioAnalyser(audio, 32);
-});
 
 // ======= LOOP ANIMAZIONE =======
 function animate() {
