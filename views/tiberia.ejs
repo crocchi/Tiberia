@@ -21,8 +21,8 @@
       document.body.appendChild(renderer.domElement);
 
       // Ambient light
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-      scene.add(ambientLight);
+      //const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+      //scene.add(ambientLight);
 
       // Load GLB model
       const loader = new THREE.GLTFLoader();
@@ -38,6 +38,8 @@
         console.error(error);
       });
 
+      console.log(scene)
+      console.log(model )
       // Controls for interaction
       const controls = new THREE.OrbitControls(camera, renderer.domElement);
       controls.enablePan = true;
