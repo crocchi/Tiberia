@@ -6,10 +6,7 @@ import { useFrame } from '@react-three/fiber';
 function Avatar({ lipsync }) {
   const { scene } = useGLTF('/models/Predator_s.glb');
 
-React.useEffect(() => {
-    console.log(scene.children.map(obj => obj));
-  }, [scene]);
-
+console.log(scene);
 useFrame(() => {
   const mouth = scene.getObjectByName('Mouth');
   if (mouth && mouth.morphTargetInfluences) {
