@@ -24,6 +24,9 @@ app.get('/t', (req, res) => {
 app.get('/', (req, res) => {
   res.render('face');
 });
+app.get('/s', (req, res) => {
+  res.render('tiberia');
+});
 
 
 // Avvia il server
