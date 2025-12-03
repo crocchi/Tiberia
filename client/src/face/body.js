@@ -4,15 +4,13 @@ import { useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 
 function Avatar({ lipsync }) {
-  const { scene } = useGLTF('/models/Predator_s.glb');
+  const { scene } = useGLTF('/models/Duck.glb');
+  React.useEffect(() => {
+  console.log(scene.children.map(obj => obj.name));
+}, [scene]);
 
 console.log(scene);
-useFrame(() => {
-  const mouth = scene.getObjectByName('Mouth');
-  if (mouth && mouth.morphTargetInfluences) {
-    mouth.morphTargetInfluences[0] = Math.abs(Math.sin(Date.now() * 0.005));
-  }
-});
+
 }
 
 export default function TiberiaFace({ audioSrc }) {
