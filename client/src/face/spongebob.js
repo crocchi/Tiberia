@@ -1,6 +1,5 @@
 import React, { useRef, useEffect } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { useGLTF } from '@react-three/drei'
 import { useGLTF, OrbitControls, useTexture } from '@react-three/drei';  // Aggiungi useTexture
 
 // Muovere il modello 3D con le gesture da mobile (es. ruotare, zoomare, spostare con il dito)
