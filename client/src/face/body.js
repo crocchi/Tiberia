@@ -14,7 +14,7 @@ function Avatar({ lipsync }) {
   const group = useRef();
 
   // Carica le texture per gli occhi (adatta i path alle tue immagini)
-  const eyesOpenTexture = useTexture('/models/textures/gltf_embedded_4.jpeg');  // Texture occhi aperti
+  const eyesOpenTexture = useTexture('/models/textures/gltf_close.jpeg');  // Texture occhi aperti
   const eyesClosedTexture = useTexture('/models/textures/gltf_embedded_10.jpeg');  // Texture occhi chiusi
 
   // Posizione avatar nel frame
@@ -24,18 +24,6 @@ function Avatar({ lipsync }) {
   scene.scale.x = 7;
   scene.scale.y = 7;
   scene.scale.z = 7;
-
-  React.useEffect(() => {
-    scene.traverse(obj => {
-      if (obj.isMesh) {
-        console.log('Mesh:', obj.name);
-        // Controlla se EyesNode ha morph targets (probabilmente no per questo modello)
-        if (obj.name === 'EyesNode' && obj.morphTargetInfluences) {
-          console.log('Morph targets per EyesNode:', obj.morphTargetDictionary);
-        }
-      }
-    });
-  }, [scene]);
 
   // Forza visibilità degli occhi (EyesNode) e applica texture iniziale
   React.useEffect(() => {
