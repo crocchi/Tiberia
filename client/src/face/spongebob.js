@@ -15,7 +15,7 @@ import { useGLTF } from '@react-three/drei'
 
 function FaceModel(props) {
   const group = useRef()
-  const { scene, nodes } = useGLTF('/path/to/your/model.glb')
+  const { scene, nodes } = useGLTF(avatar[6])  // Carica modello Spongebob
 
   // Trova i mesh degli occhi e della bocca (modifica i nomi secondo il tuo modello)
   const leftEye = nodes['LeftEye'] // oppure nodes['Object_XXX']
@@ -28,6 +28,8 @@ function FaceModel(props) {
 
   // Stato per animazione bocca
   const mouthValue = useRef(0)
+  console.log('scene:', scene)
+  console.log('nodes:', nodes)
 
   useFrame((state, delta) => {
     // Occhi: apri/chiudi ogni 2 secondi
