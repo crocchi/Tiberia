@@ -15,13 +15,19 @@ function FaceModel(props) {
   const { scene, nodes } = useGLTF(avatar[6])  // Carica modello Spongebob
 
   // Trova i mesh degli occhi e della bocca (modifica i nomi secondo il tuo modello)
-  const leftEye = nodes['LeftEye'] // oppure nodes['Object_XXX']
-  const rightEye = nodes['RightEye']
+  const leftEye = nodes['Left_Eye'] // oppure nodes['Object_XXX']
+  const rightEye = nodes['Right_Eye']
   const mouth = nodes['Mouth']
 
   // Stato per animazione occhi
   const eyeOpen = useRef(true)
   let eyeTimer = useRef(0)
+
+  letposition={
+    "x": 0,
+    "y": -2,
+    "z": 2
+}
 
   // Stato per animazione bocca
   const mouthValue = useRef(0)
