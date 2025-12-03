@@ -27,19 +27,20 @@
       // Load GLB model
       const loader = new THREE.GLTFLoader();
       let model;
-        loader.load('https://tiberia.onrender.com/models/spongebob.glb', function (gltf) {
+        loader.load('https://tiberia.onrender.com/models/Dayo.glb', function (gltf) {
         model = gltf.scene;
         scene.add(model);
 
         // Position and scale for bust view
         model.position.set(0, -1, 0);
         model.scale.set(1, 1, 1);
+           console.log(model)
       }, undefined, function (error) {
         console.error(error);
       });
 
       console.log(scene)
-      console.log(model)
+   
       // Controls for interaction
       const controls = new THREE.OrbitControls(camera, renderer.domElement);
       controls.enablePan = true;
