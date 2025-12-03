@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Bust Animation with Three.js</title>
+    <style>
+      html, body, canvas { height: 100%; margin: 0; padding: 0; overflow: hidden; }
+    </style>
+  </head>
+  <body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+      // Initialize scene, camera, renderer
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      // Ambient light
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+      scene.add(ambientLight);
+
+      // Load GLB model
+      const loader = new THREE.GLTFLoader();
+      let model;
+      loader.load('/models/bust.glb', function (gltf) {
+        model = gltf.scene;
+        scene.add(model);
+
+        // Position and scale for bust view
+        model.position.set(0, -1, 0);
+        model.scale.set(1, 1, 1);
+      }, undefined, function (error) {
+        console.error(error);
+      });
+
+      // Controls for interaction
+      const controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enablePan = true;
+      controls.enableZoom = true;
+      controls.enableRotate = true;
+
+      // Animation loop
+      function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      // Handle window resize
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    </script>
+  </body>
+</html>
