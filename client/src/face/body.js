@@ -12,7 +12,12 @@ function Avatar({ lipsync }) {
   });
 
   console.log(scene);
-
+return (
+    <primitive
+      object={scene}
+      onClick={() => setRot(rot + Math.PI / 2)}
+    />
+  );
 }
 
 export default function TiberiaFace({ audioSrc }) {
