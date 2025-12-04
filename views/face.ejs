@@ -59,13 +59,19 @@
             console.log(model)
 
             // trova tutte le bones
-            model.traverse((obj) => {
+            model.traverse(async (obj) => {
                 if (obj.isBone) {
                     bones[obj.name] = obj;
-                    //console.log("Trovata bone:", obj.name);
-                    obj.position.set(0, 0, 0);
+                    console.log("Trovato bone:", obj.name);
+                    let tmp1 = obj.rotation.y;
+                    let tmp2 = obj.rotation.x;
+                   // obj.position.set(0, 0, 0);
+                 
                     obj.rotation.y = 0;
                     obj.rotation.x = 0;
+                    await sleep(1000);
+                    obj.rotation.y = tmp1;
+                    obj.rotation.x = tmp2;
                    // obj.scale.set(2, 2, 1);
                 }
                 if (obj.type === "Bone") {
@@ -116,6 +122,10 @@
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
+
+        function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
     </script>
 </body>
 
