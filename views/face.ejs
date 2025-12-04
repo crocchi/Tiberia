@@ -28,8 +28,11 @@
 
         let occhioDx="Right_Top_Eyelid_017";
         let occhioSx="Left_Top_Eyelid_014";
-        let labbro="Jaw_06";
+        let labbro="Jaw_06";// rotation.x apre la bocca
         let bustoBone="���_05"//muovi osso busto
+        let naso="Nose_09"//muovi osso naso
+        let pupillaDx="���R_016"//muovi osso pupilla destra
+        let pupillaSx="���L_013"//muovi osso pupilla sinistra
 
         const init = async () => {  
         const scene = new THREE.Scene();
@@ -41,7 +44,7 @@
         );
         camera.position.set(0.5, 0.5, 0.5);
         const renderer = new THREE.WebGLRenderer();
-        renderer.setSize(window.innerWidth/2, window.innerHeight/2);
+        renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
         // Ambient light
