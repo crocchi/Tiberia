@@ -29,6 +29,7 @@
         let occhioDx="Right_Top_Eyelid_017";
         let occhioSx="Left_Top_Eyelid_014";
         let labbro="Jaw_06";
+        let bustoBone="���_05"//muovi osso busto
 
         const init = async () => {  
         const scene = new THREE.Scene();
@@ -38,9 +39,9 @@
             0.1,
             100
         );
-        camera.position.set(0, 1, 2);
+        camera.position.set(0.5, 0.5, 0.5);
         const renderer = new THREE.WebGLRenderer();
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setSize(window.innerWidth/2, window.innerHeight/2);
         document.body.appendChild(renderer.domElement);
 
         // Ambient light
@@ -176,6 +177,8 @@ setInterval(blinkEyes, 2700);
 (index):142 Test bone: Nose_09
 (index):142 Test bone: Nose_end_094
 Test bone: Right_Top_Eyelid_017
+pupilla ���R_016
+        ���L_013
 
 */
     </script>
