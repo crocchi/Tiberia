@@ -53,17 +53,18 @@
     model.traverse((obj) => {
         if (obj.isBone) {
             bones[obj.name] = obj;
-            console.log("Trovata bone:", obj.name);
+            //console.log("Trovata bone:", obj.name);
         }
         if(obj.type === "Bone"){
 
         }else if(obj.type === "SkinnedMesh"){
            meshes[obj.name] = obj;
-           console.log("Trovata mesh:", obj.name);
+         //  console.log("Trovata mesh:", obj.name);
         }
 
     });
-
+console.log("Bones trovate:", bones);
+console.log("Meshes trovate:", meshes);
       }, undefined, function (error) {
         console.error(error);
       });
