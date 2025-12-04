@@ -23,9 +23,6 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        // Variabile visemi passata dal server
-        //const visemeSequence = <%- JSON.stringify(visemeSequence) %>;
-        console.log("Viseme Sequence:", visemeSequence);
         // Initialize scene, camera, renderer
         let bones = {};   // qui salveremo tutte le bones
         let meshes = {}; // qui salveremo tutte le mesh
@@ -50,7 +47,7 @@
             const renderer = new THREE.WebGLRenderer();
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.body.appendChild(renderer.domElement);
-            
+
             // Avvia audio e animazione visemi al click sul canvas
             renderer.domElement.addEventListener('click', () => {
                 // Richiedi audio e visemi al server
