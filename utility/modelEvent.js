@@ -3,16 +3,17 @@ import { client, bot} from '../.devcontainer/config.js';
 
 
 export const startModelAudio = async (responseText) => {
+  let textToSpeak = responseText || 'Ciao io sono Spongebob, e tu? COme stai in questa bellissima giornata? Spero tutto bene!';
 
 const mp3 = await client.audio.speech.create({
             model: "gpt-4o-mini-tts",//"tts-1",gpt-realtime-mini
             voice: "fable", // Puoi scegliere tra: alloy, echo, fable, onyx, nova, shale
-            input: 'Ciao io sono Spongebob, e tu? COme stai in questa bellissima giornata? Spero tutto bene!',
+            input: textToSpeak,
             instructions: "Parla con la voce simile a spongebob ",
           });
           const audioBuffer = Buffer.from(await mp3.arrayBuffer());
           // Genera la sequenza visemi dal testo
-    const visemeSequence = generateVisemeSequence(responseText);
+    const visemeSequence = generateVisemeSequence(textToSpeak);
 
           console.log(`Risposta audio e visemi inviata a Tiberia.`);
           return {audioBuffer, visemeSequence}
