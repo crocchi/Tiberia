@@ -13,41 +13,18 @@
             padding: 0;
             overflow: hidden;
         }
-     #audio::-webkit-media-controls-panel {
-  background: transparent;
-  box-shadow: none;
-}
-
-#modelAudio::-webkit-media-controls-play-button {
-  filter: none;
-}
-
-#modelAudio::-webkit-media-controls-timeline,
-#modelAudio::-webkit-media-controls-current-time-display,
-#modelAudio::-webkit-media-controls-time-remaining-display,
-#modelAudio::-webkit-media-controls-seek-back-button,
-#modelAudio::-webkit-media-controls-seek-forward-button,
-#modelAudio::-webkit-media-controls-mute-button,
-#modelAudio::-webkit-media-controls-volume-slider,
-#modelAudio::-webkit-media-controls-fullscreen-button,
-#modelAudio::-webkit-media-controls-download-button {
-  display: none !important;
-}
     </style>
 </head>
 
 <body>
-<audio id="modelAudio" controls>
-  <source src="data:audio/mpeg;base64,<%= audioBase64 %>" type="audio/mpeg">
-  Il tuo browser non supporta l'audio.
-
-</audio>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <script>
+   <script src="/socket.io/socket.io.js"></script>
+   <script>
+    const socket = io();
     // Variabile visemi passata dal server
-    const visemeSequence = <%- JSON.stringify(visemeSequence) %>;
+    //const visemeSequence = <%- JSON.stringify(visemeSequence) %>;
         console.log("Viseme Sequence:", visemeSequence);
         // Initialize scene, camera, renderer
         let bones = {};   // qui salveremo tutte le bones
@@ -212,38 +189,50 @@ pupilla ���R_016
 */
 document.addEventListener('DOMContentLoaded', (event) => {
 
- const audioElement = document.getElementById('modelAudio');
+
     init();
-     audioElement.addEventListener('play', () => {
-        if (bones["Jaw_06"]) {
-            // Animazione bocca: apre e chiude ogni 200ms
-            mouthAnim = setInterval(() => {
-                bones["Jaw_06"].rotation.x = 0.3 + Math.sin(Date.now() * 0.2) * 0.2;
-            }, 100);
+
+    // Richiedi audio e visemi quando vuoi (es: al click di un bottone)
+socket.emit('requestAudio', 'Ciao io sono Spongebob, e tu? COme stai in questa bellissima giornata? Spero tutto bene!');
+
+
+socket.on('audioData', ({ audioBase64, visemeSequence }) => {
+    // Decodifica il base64 in ArrayBuffer
+    const binary = atob(audioBase64);
+    const len = binary.length;
+    const buffer = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+        buffer[i] = binary.charCodeAt(i);
+    }
+
+    // Usa AudioContext per riprodurre l'audio
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    audioCtx.decodeAudioData(buffer.buffer, (audioBuffer) => {
+        const source = audioCtx.createBufferSource();
+        source.buffer = audioBuffer;
+        source.connect(audioCtx.destination);
+        source.start();
+
+        // Avvia animazione visemi sincronizzata
+        let visemeIdx = 0;
+        function animateViseme() {
+            if (visemeIdx < visemeSequence.length) {
+                const { time, viseme } = visemeSequence[visemeIdx];
+                if (bones["Jaw_06"]) {
+                    bones["Jaw_06"].rotation.x = viseme === 'open' ? 0.5 : 0;
+                }
+                visemeIdx++;
+                if (visemeIdx < visemeSequence.length) {
+                    const nextTime = (visemeSequence[visemeIdx].time - time) * 1000;
+                    setTimeout(animateViseme, nextTime);
+                }
+            }
         }
+        animateViseme();
     });
-    audioElement.addEventListener('pause', () => {
-        if (bones["Jaw_06"]) bones["Jaw_06"].rotation.x = 0;
-        clearInterval(mouthAnim);
-    });
-    audioElement.addEventListener('ended', () => {
-        if (bones["Jaw_06"]) bones["Jaw_06"].rotation.x = 0;
-        clearInterval(mouthAnim);
-    });
-    /*
-    audioElement.addEventListener('play', () => {
-  // Esempio: apri la bocca quando parte l'audio
-  if (bones["Jaw_06"]) {
-    bones["Jaw_06"].rotation.x += 0.5;
-  }
 });
-audioElement.addEventListener('pause', () => {
-  // Chiudi la bocca quando l'audio si ferma
-  if (bones["Jaw_06"]) {
-    bones["Jaw_06"].rotation.x -= 0.5;
-  }
-});
-*/
+
+
 });
     </script>
 </body>

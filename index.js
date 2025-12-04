@@ -1,7 +1,7 @@
 //. TIBERIA V.0.0.3
 import path from 'path';
 import express from 'express';
-import { app, port, client, assistantId, bot,INDEX_DB_NEWS, INDEX_DB_EVENTS } from './.devcontainer/config.js';
+import { app, port, io, client, assistantId, bot,INDEX_DB_NEWS, INDEX_DB_EVENTS } from './.devcontainer/config.js';
 import { botOnMsg,botOnVoice,botOnLocation } from './telegram.js';
 import cron from 'node-cron';
 import { fetchAndIndexEvents } from './utility/capri-events.js';
@@ -23,12 +23,20 @@ app.get('/t', (req, res) => {
 });
 
 app.get('/', async (req, res) => {
-  // Converti il buffer in base64
-  const {audioBuffer, visemeSequence} = await startModelAudio();
-  const audioBase64 = audioBuffer.toString('base64');
 
-  res.render('face', { audioBase64, visemeSequence });
+  res.render('face');
 });
+
+io.on('connection', (socket) => {
+  socket.on('requestAudio', async (responseText) => {
+    const { audioBuffer, visemeSequence } = await startModelAudio();
+    const audioBase64 = audioBuffer.toString('base64');
+    socket.emit('audioData', { audioBase64, visemeSequence });
+  });
+});
+
+
+
 app.get('/s', (req, res) => {
   res.render('tiberia');
 });

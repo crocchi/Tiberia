@@ -1,4 +1,6 @@
 import express from 'express';
+import http from 'http';
+import { Server } from 'socket.io';
 import OpenAI from "openai";
 import TelegramBot from 'node-telegram-bot-api';
 import dotenv from 'dotenv';
@@ -8,6 +10,11 @@ dotenv.config();
 
 // --- CONFIGURAZIONE EXPRESS ---
 const app = express();
+const server = http.createServer(app);
+
+//-------- CONFIGURAZIONE SOCKET.IO ------
+const io = new Server(server);
+
 // Render fornisce la porta tramite la variabile d'ambiente PORT
 const port = process.env.PORT || 3000;
 app.use(express.json());
@@ -45,4 +52,4 @@ export const INDEX_DB_NEWS = 'tiberia-news';
 export const INDEX_DB_WEATHER = 'tiberia-weather';
 export const INDEX_DB_USER = 'tiberia-user';
 
-export { app, port, client, assistantId, bot , vectorStoreId};
+export { app, port, client, assistantId, bot , vectorStoreId , io};
