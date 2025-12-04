@@ -42,7 +42,7 @@
             0.1,
             100
         );
-        camera.position.set(1.5, 1.5, 1.5);// posizione camera
+        camera.position.set(1.5, 1.5, 2.5);// posizione camera
         const renderer = new THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
@@ -52,7 +52,7 @@
         scene.add(ambientLight);
         // Aggiungi una luce direzionale per ombreggiatura
         const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-        directionalLight.position.set(5, 5, 5);
+        directionalLight.position.set(4, 4, 5);
         scene.add(directionalLight);
 
         // Load GLB model
@@ -63,8 +63,8 @@
             scene.add(model);
 
             // Position and scale for bust view
-            model.position.set(0, -1, 0);
-            model.scale.set(0.7, 0.7, 0.7);
+            model.position.set(0, 0, 0);
+            model.scale.set(0.5, 0.5, 0.5);
             console.log(model)
 
             // trova tutte le bones
