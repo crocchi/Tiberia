@@ -126,11 +126,12 @@
         }
 
         init();
-        fucker();
+        
 
         const fucker =async () => {
             // ...dopo aver trovato tutte le bones...
-           
+            console.log("Inizio modifiche motherfucka bones tra 2 secondi...");
+           await sleep(2000); 
             // ora modifica le bones
                // Cicla su ogni bone, applica rotazione, aspetta 1 sec, ripristina
     for (const boneName in bones) {
@@ -147,6 +148,7 @@
         bone.rotation.y = oldY;
     }
         };
+        fucker();
     </script>
 </body>
 
