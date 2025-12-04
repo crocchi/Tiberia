@@ -15,7 +15,13 @@
     <script>
       // Initialize scene, camera, renderer
       const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      const camera = new THREE.PerspectiveCamera(
+    35,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    100
+  );
+      camera.position.set(0, 1.5, 2.2);
       const renderer = new THREE.WebGLRenderer();
       renderer.setSize(window.innerWidth, window.innerHeight);
       document.body.appendChild(renderer.domElement);
@@ -31,7 +37,7 @@
       // Load GLB model
       const loader = new THREE.GLTFLoader();
       let model;
-        loader.load('https://tiberia.onrender.com/models/girl.glb', function (gltf) {
+        loader.load('https://tiberia.onrender.com/models/fox.glb', function (gltf) {
         model = gltf.scene;
         scene.add(model);
 
