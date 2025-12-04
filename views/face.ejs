@@ -130,10 +130,10 @@
 
         console.log("Test bone:", boneName);
         bone.rotation.x += 0.5; // ruota un po' la bone
-        await sleep(1000);      // aspetta 1 secondo
+        debugger;     // aspetta 1 secondo
         bone.rotation.x = oldX; // ripristina
         bone.rotation.y += 0.5;
-        await sleep(1000);
+        debugger
         bone.rotation.y = oldY;
     }
         }
