@@ -2,7 +2,7 @@ import { client, bot} from '../.devcontainer/config.js';
 
 
 
-const startModelAudio = async (responseText) => {
+export const startModelAudio = async (responseText) => {
 
 const mp3 = await client.audio.speech.create({
             model: "gpt-4o-mini-tts",//"tts-1",gpt-realtime-mini
