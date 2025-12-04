@@ -1,4 +1,4 @@
-import { client, bot} from './.devcontainer/config.js';
+import { client, bot} from '../.devcontainer/config.js';
 
 
 
