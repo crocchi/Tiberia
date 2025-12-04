@@ -29,6 +29,7 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
     <script>
+        
         // Initialize scene, camera, renderer
         let bones = {};   // qui salveremo tutte le bones
         let meshes = {}; // qui salveremo tutte le mesh
@@ -137,7 +138,6 @@
 
         }
 
-        init();
         
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -193,6 +193,7 @@ pupilla ���R_016
 */
 document.addEventListener('DOMContentLoaded', (event) => {
     const audioElement = document.getElementById('modelAudio');
+    init();
     audioElement.addEventListener('play', () => {
   // Esempio: apri la bocca quando parte l'audio
   if (bones["Jaw_06"]) {
