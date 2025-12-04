@@ -14,6 +14,9 @@
 
     <script>
       // Initialize scene, camera, renderer
+      let bones = {};   // qui salveremo tutte le bones
+      let meshes = {}; // qui salveremo tutte le mesh
+
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(
     35,
@@ -51,6 +54,12 @@
         if (obj.isBone) {
             bones[obj.name] = obj;
             console.log("Trovata bone:", obj.name);
+        }
+        if(obj.type === "Bone"){
+
+        }else if(obj.type === "SkinnedMesh"){
+           meshes[obj.name] = obj;
+           console.log("Trovata mesh:", obj.name);
         }
 
     });
