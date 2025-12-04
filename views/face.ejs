@@ -122,7 +122,17 @@
         function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
-   // Cicla su ogni bone, applica rotazione, aspetta 1 sec, ripristina
+
+        }
+
+        init();
+        fucker();
+
+        const fucker =async () => {
+            // ...dopo aver trovato tutte le bones...
+           
+            // ora modifica le bones
+               // Cicla su ogni bone, applica rotazione, aspetta 1 sec, ripristina
     for (const boneName in bones) {
         const bone = bones[boneName];
         const oldX = bone.rotation.x;
@@ -130,15 +140,13 @@
 
         console.log("Test bone:", boneName);
         bone.rotation.x += 0.5; // ruota un po' la bone
-        debugger;     // aspetta 1 secondo
+         await sleep(1000);   // aspetta 1 secondo
         bone.rotation.x = oldX; // ripristina
         bone.rotation.y += 0.5;
-        debugger
+        await sleep(1000);
         bone.rotation.y = oldY;
     }
-        }
-
-        init();
+        };
     </script>
 </body>
 
