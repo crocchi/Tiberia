@@ -26,6 +26,7 @@
         let bones = {};   // qui salveremo tutte le bones
         let meshes = {}; // qui salveremo tutte le mesh
 
+        const init = async () => {  
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(
             35,
@@ -59,19 +60,11 @@
             console.log(model)
 
             // trova tutte le bones
-            model.traverse(async (obj) => {
+            model.traverse((obj) => {
                 if (obj.isBone) {
                     bones[obj.name] = obj;
                     console.log("Trovato bone:", obj.name);
-                    let tmp1 = obj.rotation.y;
-                    let tmp2 = obj.rotation.x;
-                   // obj.position.set(0, 0, 0);
-                 
-                    obj.rotation.y = 0;
-                    obj.rotation.x = 0;
-                    await sleep(1000);
-                    obj.rotation.y = tmp1;
-                    obj.rotation.x = tmp2;
+               
                    // obj.scale.set(2, 2, 1);
                 }
                 if (obj.type === "Bone") {
@@ -86,6 +79,8 @@
                 }
 
             });
+
+            
             /*
             bones["Head"].rotation.x = THREE.MathUtils.degToRad(10);
         bones["Head"].rotation.y = THREE.MathUtils.degToRad(-5);
@@ -96,6 +91,7 @@
         bones["Neck"].scale.y = 1.2;*/
             console.log("Bones trovate:", bones);
             console.log("Meshes trovate:", meshes);
+            
         }, undefined, function (error) {
             console.error(error);
         });
@@ -126,6 +122,23 @@
         function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
+   // Cicla su ogni bone, applica rotazione, aspetta 1 sec, ripristina
+    for (const boneName in bones) {
+        const bone = bones[boneName];
+        const oldX = bone.rotation.x;
+        const oldY = bone.rotation.y;
+
+        console.log("Test bone:", boneName);
+        bone.rotation.x += 0.5; // ruota un po' la bone
+        await sleep(1000);      // aspetta 1 secondo
+        bone.rotation.x = oldX; // ripristina
+        bone.rotation.y += 0.5;
+        await sleep(1000);
+        bone.rotation.y = oldY;
+    }
+        }
+
+        init();
     </script>
 </body>
 
