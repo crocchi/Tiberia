@@ -20,220 +20,222 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-   <script src="/socket.io/socket.io.js"></script>
-   <script>
-    const socket = io();
-    // Variabile visemi passata dal server
-    //const visemeSequence = <%- JSON.stringify(visemeSequence) %>;
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        // Variabile visemi passata dal server
+        //const visemeSequence = <%- JSON.stringify(visemeSequence) %>;
         console.log("Viseme Sequence:", visemeSequence);
         // Initialize scene, camera, renderer
         let bones = {};   // qui salveremo tutte le bones
         let meshes = {}; // qui salveremo tutte le mesh
 
-        let occhioDx="Right_Top_Eyelid_017";
-        let occhioSx="Left_Top_Eyelid_014";
-        let labbro="Jaw_06";// rotation.x apre la bocca
-        let bustoBone="���_05"//muovi osso busto
-        let naso="Nose_09"//muovi osso naso
-        let pupillaDx="���R_016"//muovi osso pupilla destra
-        let pupillaSx="���L_013"//muovi osso pupilla sinistra
+        let occhioDx = "Right_Top_Eyelid_017";
+        let occhioSx = "Left_Top_Eyelid_014";
+        let labbro = "Jaw_06";// rotation.x apre la bocca
+        let bustoBone = "���_05"//muovi osso busto
+        let naso = "Nose_09"//muovi osso naso
+        let pupillaDx = "���R_016"//muovi osso pupilla destra
+        let pupillaSx = "���L_013"//muovi osso pupilla sinistra
 
-        const init = async () => {  
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(
-            35,
-            window.innerWidth / window.innerHeight,
-            0.1,
-            100
-        );
-        camera.position.set(1.5, 1.5, 2.5);// posizione camera
-        const renderer = new THREE.WebGLRenderer();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
-
-        // Ambient light
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-        scene.add(ambientLight);
-        // Aggiungi una luce direzionale per ombreggiatura
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-        directionalLight.position.set(4, 4, 5);
-        scene.add(directionalLight);
-
-        // Load GLB model
-        const loader = new THREE.GLTFLoader();
-        let model;
-        loader.load('https://tiberia.onrender.com/models/spongebob.glb', function (gltf) {
-            model = gltf.scene;
-            scene.add(model);
-
-            // Position and scale for bust view
-            model.position.set(0, 0, 0);
-            model.scale.set(0.3, 0.3, 0.3);
-            console.log(model)
-
-            // trova tutte le bones
-            model.traverse((obj) => {
-                if (obj.isBone) {
-                    bones[obj.name] = obj;
-                   // console.log("Trovato bone:", obj.name);
-               
-                   // obj.scale.set(2, 2, 1);
-                }
-                if (obj.type === "Bone") {
-
-                } else if (obj.type === "SkinnedMesh") {
-                    meshes[obj.name] = obj;
-                    //  console.log("Trovata mesh:", obj.name);
-                }else if(obj.morphTargetInfluences){
-                    console.log("Trovato morph target:", obj.name);
-                    // Imposta l'influenza del morph target (ad esempio, 0.5 per metà trasformazione)
-                    obj.morphTargetInfluences[0] = 1.0; // Cambia l'indice e il valore secondo le tue esigenze
-                }
-
+        const init = async () => {
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(
+                35,
+                window.innerWidth / window.innerHeight,
+                0.1,
+                100
+            );
+            camera.position.set(1.5, 1.5, 2.5);// posizione camera
+            const renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+            
+            // Avvia audio e animazione visemi al click sul canvas
+            renderer.domElement.addEventListener('click', () => {
+                // Richiedi audio e visemi al server
+                socket.emit('requestAudio', 'Ciao io sono Spongebob, e tu? COme stai in questa bellissima giornata? Spero tutto bene!');
             });
 
-            
-            /*
-            bones["Head"].rotation.x = THREE.MathUtils.degToRad(10);
-        bones["Head"].rotation.y = THREE.MathUtils.degToRad(-5);
-        ✔ Posizione (meno comune)
- 
-        bones["Jaw"].position.y -= 0.01;
+            // Ambient light
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+            // Aggiungi una luce direzionale per ombreggiatura
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(4, 4, 5);
+            scene.add(directionalLight);
 
-        bones["Neck"].scale.y = 1.2;*/
-            console.log("Bones trovate:", bones);
-            console.log("Meshes trovate:", meshes);
-            //fucker();
-        }, undefined, function (error) {
-            console.error(error);
-        });
+            // Load GLB model
+            const loader = new THREE.GLTFLoader();
+            let model;
+            loader.load('https://tiberia.onrender.com/models/spongebob.glb', function (gltf) {
+                model = gltf.scene;
+                scene.add(model);
 
-        console.log(scene)
+                // Position and scale for bust view
+                model.position.set(0, 0, 0);
+                model.scale.set(0.3, 0.3, 0.3);
+                console.log(model)
 
-        // Controls for interaction
-        const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.enablePan = true;
-        controls.enableZoom = true;
-        controls.enableRotate = true;
+                // trova tutte le bones
+                model.traverse((obj) => {
+                    if (obj.isBone) {
+                        bones[obj.name] = obj;
+                        // console.log("Trovato bone:", obj.name);
 
-        // Animation loop
-        function animate() {
-            requestAnimationFrame(animate);
-            controls.update();
-            renderer.render(scene, camera);
+                        // obj.scale.set(2, 2, 1);
+                    }
+                    if (obj.type === "Bone") {
+
+                    } else if (obj.type === "SkinnedMesh") {
+                        meshes[obj.name] = obj;
+                        //  console.log("Trovata mesh:", obj.name);
+                    } else if (obj.morphTargetInfluences) {
+                        console.log("Trovato morph target:", obj.name);
+                        // Imposta l'influenza del morph target (ad esempio, 0.5 per metà trasformazione)
+                        obj.morphTargetInfluences[0] = 1.0; // Cambia l'indice e il valore secondo le tue esigenze
+                    }
+
+                });
+
+
+                /*
+                bones["Head"].rotation.x = THREE.MathUtils.degToRad(10);
+            bones["Head"].rotation.y = THREE.MathUtils.degToRad(-5);
+            ✔ Posizione (meno comune)
+     
+            bones["Jaw"].position.y -= 0.01;
+    
+            bones["Neck"].scale.y = 1.2;*/
+                console.log("Bones trovate:", bones);
+                console.log("Meshes trovate:", meshes);
+                //fucker();
+            }, undefined, function (error) {
+                console.error(error);
+            });
+
+            console.log(scene)
+
+            // Controls for interaction
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enablePan = true;
+            controls.enableZoom = true;
+            controls.enableRotate = true;
+
+            // Animation loop
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+
         }
-        animate();
-
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
 
 
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
         }
 
-        
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-        const fucker =async () => {
+        const fucker = async () => {
             // ...dopo aver trovato tutte le bones...
             console.log("Inizio modifiche motherfucka bones tra 2 secondi...");
-           await sleep(2000); 
+            await sleep(2000);
             // ora modifica le bones
-               // Cicla su ogni bone, applica rotazione, aspetta 1 sec, ripristina
-    for (const boneName in bones) {
-        const bone = bones[boneName];
-        const oldX = bone.rotation.x;
-        const oldY = bone.rotation.y;
+            // Cicla su ogni bone, applica rotazione, aspetta 1 sec, ripristina
+            for (const boneName in bones) {
+                const bone = bones[boneName];
+                const oldX = bone.rotation.x;
+                const oldY = bone.rotation.y;
 
-        console.log("Test bone:", boneName);
-        bone.rotation.x += 0.5; // ruota un po' la bone
-         await sleep(1000);   // aspetta 1 secondo
-        bone.rotation.x = oldX; // ripristina
-        bone.rotation.y += 0.5;
-        await sleep(1000);
-        bone.rotation.y = oldY;
-    }
+                console.log("Test bone:", boneName);
+                bone.rotation.x += 0.5; // ruota un po' la bone
+                await sleep(1000);   // aspetta 1 secondo
+                bone.rotation.x = oldX; // ripristina
+                bone.rotation.y += 0.5;
+                await sleep(1000);
+                bone.rotation.y = oldY;
+            }
         };
 
 
 
         function blinkEyes() {
-    if (bones["Right_Top_Eyelid_017"] && bones["Left_Top_Eyelid_014"]) {
-        // Chiudi occhi
-        bones["Right_Top_Eyelid_017"].rotation.x += 0.5;
-        bones["Left_Top_Eyelid_014"].rotation.x += 0.5;
-        setTimeout(() => {
-            // Apri occhi
-            bones["Right_Top_Eyelid_017"].rotation.x -= 0.5;
-            bones["Left_Top_Eyelid_014"].rotation.x -= 0.5;
-        }, 200); // occhi chiusi per 200ms
-    }
-}
-
-setInterval(blinkEyes, 2700); 
-        //sorriso=est bone: Jaw_06
-      /*
-        Test bone: Upper_Lip_08
-(index):142 Test bone: Upper_Lip_end_080
-(index):142 Test bone: Nose_09
-(index):142 Test bone: Nose_end_094
-Test bone: Right_Top_Eyelid_017
-pupilla ���R_016
-        ���L_013
-
-*/
-document.addEventListener('DOMContentLoaded', (event) => {
-
-
-    init();
-
-    // Richiedi audio e visemi quando vuoi (es: al click di un bottone)
-socket.emit('requestAudio', 'Ciao io sono Spongebob, e tu? COme stai in questa bellissima giornata? Spero tutto bene!');
-
-
-socket.on('audioData', ({ audioBase64, visemeSequence }) => {
-    // Decodifica il base64 in ArrayBuffer
-    const binary = atob(audioBase64);
-    const len = binary.length;
-    const buffer = new Uint8Array(len);
-    for (let i = 0; i < len; i++) {
-        buffer[i] = binary.charCodeAt(i);
-    }
-
-    // Usa AudioContext per riprodurre l'audio
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    audioCtx.decodeAudioData(buffer.buffer, (audioBuffer) => {
-        const source = audioCtx.createBufferSource();
-        source.buffer = audioBuffer;
-        source.connect(audioCtx.destination);
-        source.start();
-
-        // Avvia animazione visemi sincronizzata
-        let visemeIdx = 0;
-        function animateViseme() {
-            if (visemeIdx < visemeSequence.length) {
-                const { time, viseme } = visemeSequence[visemeIdx];
-                if (bones["Jaw_06"]) {
-                    bones["Jaw_06"].rotation.x = viseme === 'open' ? 0.5 : 0;
-                }
-                visemeIdx++;
-                if (visemeIdx < visemeSequence.length) {
-                    const nextTime = (visemeSequence[visemeIdx].time - time) * 1000;
-                    setTimeout(animateViseme, nextTime);
-                }
+            if (bones["Right_Top_Eyelid_017"] && bones["Left_Top_Eyelid_014"]) {
+                // Chiudi occhi
+                bones["Right_Top_Eyelid_017"].rotation.x += 0.5;
+                bones["Left_Top_Eyelid_014"].rotation.x += 0.5;
+                setTimeout(() => {
+                    // Apri occhi
+                    bones["Right_Top_Eyelid_017"].rotation.x -= 0.5;
+                    bones["Left_Top_Eyelid_014"].rotation.x -= 0.5;
+                }, 200); // occhi chiusi per 200ms
             }
         }
-        animateViseme();
-    });
-});
+
+        setInterval(blinkEyes, 2700);
+        //sorriso=est bone: Jaw_06
+        /*
+          Test bone: Upper_Lip_08
+  (index):142 Test bone: Upper_Lip_end_080
+  (index):142 Test bone: Nose_09
+  (index):142 Test bone: Nose_end_094
+  Test bone: Right_Top_Eyelid_017
+  pupilla ���R_016
+          ���L_013
+  
+  */
+        document.addEventListener('DOMContentLoaded', (event) => {
 
 
-});
+            init();
+
+            socket.on('audioData', ({ audioBase64, visemeSequence }) => {
+                // Decodifica il base64 in ArrayBuffer
+                const binary = atob(audioBase64);
+                const len = binary.length;
+                const buffer = new Uint8Array(len);
+                for (let i = 0; i < len; i++) {
+                    buffer[i] = binary.charCodeAt(i);
+                }
+
+                // Usa AudioContext per riprodurre l'audio
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                audioCtx.decodeAudioData(buffer.buffer, (audioBuffer) => {
+                    const source = audioCtx.createBufferSource();
+                    source.buffer = audioBuffer;
+                    source.connect(audioCtx.destination);
+                    source.start();
+
+                    // Avvia animazione visemi sincronizzata
+                    let visemeIdx = 0;
+                    function animateViseme() {
+                        if (visemeIdx < visemeSequence.length) {
+                            const { time, viseme } = visemeSequence[visemeIdx];
+                            if (bones["Jaw_06"]) {
+                                bones["Jaw_06"].rotation.x = viseme === 'open' ? 0.5 : 0;
+                            }
+                            visemeIdx++;
+                            if (visemeIdx < visemeSequence.length) {
+                                const nextTime = (visemeSequence[visemeIdx].time - time) * 1000;
+                                setTimeout(animateViseme, nextTime);
+                            }
+                        }
+                    }
+                    animateViseme();
+                });
+            });
+
+
+        });
     </script>
 </body>
 
