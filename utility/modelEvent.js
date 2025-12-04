@@ -11,9 +11,23 @@ const mp3 = await client.audio.speech.create({
             instructions: "Parla con la voce simile a spongebob ",
           });
           const audioBuffer = Buffer.from(await mp3.arrayBuffer());
+          // Genera la sequenza visemi dal testo
+    const visemeSequence = generateVisemeSequence(responseText);
 
-          console.log(`Risposta audio inviata a Tiberia.`);
-          return audioBuffer;
+          console.log(`Risposta audio e visemi inviata a Tiberia.`);
+          return {audioBuffer, visemeSequence}
 
 
         }
+
+
+// Funzione placeholder per generare visemi dal testo
+export const generateVisemeSequence = (responseText) => {
+    const words = responseText.split(' ');
+    // Simula una sequenza temporale: ogni parola dura 0.5 secondi
+    return words.map((word, i) => ({
+        time: i * 0.5, // tempo in secondi
+        viseme: 'open', // puoi usare 'open', 'closed', 'smile', ecc.
+        text: word
+    }));
+};

@@ -23,11 +23,11 @@ app.get('/t', (req, res) => {
 });
 
 app.get('/', async (req, res) => {
-  let audioBuffer = await startModelAudio();
   // Converti il buffer in base64
+  const {audioBuffer, visemeSequence} = await startModelAudio();
   const audioBase64 = audioBuffer.toString('base64');
 
-  res.render('face', { audioBase64 });
+  res.render('face', { audioBase64, visemeSequence });
 });
 app.get('/s', (req, res) => {
   res.render('tiberia');
@@ -47,10 +47,7 @@ app.listen(port, () => {
 app.set('view engine', 'ejs');
 app.set('views', path.join(process.cwd(), 'views'));
 
-// Esempio endpoint che usa EJS
-app.get('/tiberia', (req, res) => {
-  res.render('hello', { name: 'Tiberia' });
-});
+
 // Servi file statici dalla cartella models
 app.use('/models', express.static(path.join(process.cwd(), 'models')));
 
