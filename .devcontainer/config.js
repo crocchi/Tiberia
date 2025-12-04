@@ -19,6 +19,7 @@ const io = new Server(server);
 const port = process.env.PORT || 3000;
 app.use(express.json());
 
+
 // --- CONFIGURAZIONE OPENAI ---
 const client = new OpenAI({
   apiKey: process.env.API_KEY_OPENAI

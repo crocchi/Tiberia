@@ -46,10 +46,6 @@ app.listen(port, () => {
 });
 */
 
-// Avvia il server
-server.listen(port, () => {
-  console.log(`Bot Tiberia avviato e in ascolto sulla porta ${port}`);
-});
 
 //fetchFerryTime();
 //startNewsUpdater()
@@ -96,3 +92,8 @@ function startEventsUpdater() {
 }
 
 startEventsUpdater()
+
+// Avvia il server
+server.listen(port, () => {
+  console.log(`Bot Tiberia avviato e in ascolto sulla porta ${port}`);
+});
