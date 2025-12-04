@@ -23,9 +23,9 @@ app.get('/t', (req, res) => {
 });
 
 app.get('/', async (req, res) => {
-  let audioBuffer = await startModelAudio();
-   res.set('Content-Type', 'audio/mpeg');
-  res.render('face',audioBuffer);
+  //let audioBuffer = await startModelAudio();
+   //res.set('Content-Type', 'audio/mpeg');
+  res.render('face'/*,audioBuffer*/);
 });
 app.get('/s', (req, res) => {
   res.render('tiberia');
