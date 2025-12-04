@@ -52,4 +52,4 @@ export const INDEX_DB_NEWS = 'tiberia-news';
 export const INDEX_DB_WEATHER = 'tiberia-weather';
 export const INDEX_DB_USER = 'tiberia-user';
 
-export { app, port, client, assistantId, bot , vectorStoreId , io};
+export { app, port, client, assistantId, bot , vectorStoreId , io , server};

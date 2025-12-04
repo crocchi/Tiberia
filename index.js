@@ -1,7 +1,7 @@
 //. TIBERIA V.0.0.3
 import path from 'path';
 import express from 'express';
-import { app, port, io, client, assistantId, bot,INDEX_DB_NEWS, INDEX_DB_EVENTS } from './.devcontainer/config.js';
+import { app, port, io,server, client, assistantId, bot,INDEX_DB_NEWS, INDEX_DB_EVENTS } from './.devcontainer/config.js';
 import { botOnMsg,botOnVoice,botOnLocation } from './telegram.js';
 import cron from 'node-cron';
 import { fetchAndIndexEvents } from './utility/capri-events.js';
@@ -22,10 +22,7 @@ app.get('/t', (req, res) => {
   res.send('<h2>Bot Tiberia è attivo!</h2>');
 });
 
-app.get('/', async (req, res) => {
-
-  res.render('face');
-});
+app.get('/', (req, res) => res.render('face'));
 
 io.on('connection', (socket) => {
   socket.on('requestAudio', async (responseText) => {
@@ -43,7 +40,14 @@ app.get('/s', (req, res) => {
 
 
 // Avvia il server
+/*
 app.listen(port, () => {
+  console.log(`Bot Tiberia avviato e in ascolto sulla porta ${port}`);
+});
+*/
+
+// Avvia il server
+server.listen(port, () => {
   console.log(`Bot Tiberia avviato e in ascolto sulla porta ${port}`);
 });
 
