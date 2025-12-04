@@ -1,96 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <title>Bust Animation with Three.js</title>
     <style>
-      html, body, canvas { height: 100%; margin: 0; padding: 0; overflow: hidden; }
+        html,
+        body,
+        canvas {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
     </style>
-  </head>
-  <body>
+</head>
+
+<body>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
     <script>
-      // Initialize scene, camera, renderer
-      let bones = {};   // qui salveremo tutte le bones
-      let meshes = {}; // qui salveremo tutte le mesh
+        // Initialize scene, camera, renderer
+        let bones = {};   // qui salveremo tutte le bones
+        let meshes = {}; // qui salveremo tutte le mesh
 
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(
-    35,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    100
-  );
-      camera.position.set(0, 1.5, 2.2);
-      const renderer = new THREE.WebGLRenderer();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      document.body.appendChild(renderer.domElement);
-
-      // Ambient light
-     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-     scene.add(ambientLight);
-         // Aggiungi una luce direzionale per ombreggiatura
-      const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-      directionalLight.position.set(5, 5, 5);
-      scene.add(directionalLight);
-
-      // Load GLB model
-      const loader = new THREE.GLTFLoader();
-      let model;
-        loader.load('https://tiberia.onrender.com/models/spongebob.glb', function (gltf) {
-        model = gltf.scene;
-        scene.add(model);
-
-        // Position and scale for bust view
-        model.position.set(0, -1, 0);
-        model.scale.set(1, 1, 1);
-        console.log(model)
-
-// trova tutte le bones
-    model.traverse((obj) => {
-        if (obj.isBone) {
-            bones[obj.name] = obj;
-            //console.log("Trovata bone:", obj.name);
-        }
-        if(obj.type === "Bone"){
-
-        }else if(obj.type === "SkinnedMesh"){
-           meshes[obj.name] = obj;
-         //  console.log("Trovata mesh:", obj.name);
-        }
-
-    });
-console.log("Bones trovate:", bones);
-console.log("Meshes trovate:", meshes);
-      }, undefined, function (error) {
-        console.error(error);
-      });
-
-      console.log(scene)
-   
-      // Controls for interaction
-      const controls = new THREE.OrbitControls(camera, renderer.domElement);
-      controls.enablePan = true;
-      controls.enableZoom = true;
-      controls.enableRotate = true;
-
-      // Animation loop
-      function animate() {
-        requestAnimationFrame(animate);
-        controls.update();
-        renderer.render(scene, camera);
-      }
-      animate();
-
-      // Handle window resize
-      window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(
+            35,
+            window.innerWidth / window.innerHeight,
+            0.1,
+            100
+        );
+        camera.position.set(0, 1.5, 2.2);
+        const renderer = new THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
-      });
+        document.body.appendChild(renderer.domElement);
+
+        // Ambient light
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+        // Aggiungi una luce direzionale per ombreggiatura
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(5, 5, 5);
+        scene.add(directionalLight);
+
+        // Load GLB model
+        const loader = new THREE.GLTFLoader();
+        let model;
+        loader.load('https://tiberia.onrender.com/models/spongebob.glb', function (gltf) {
+            model = gltf.scene;
+            scene.add(model);
+
+            // Position and scale for bust view
+            model.position.set(0, -1, 0);
+            model.scale.set(1, 1, 1);
+            console.log(model)
+
+            // trova tutte le bones
+            model.traverse((obj) => {
+                if (obj.isBone) {
+                    bones[obj.name] = obj;
+                    //console.log("Trovata bone:", obj.name);
+                    obj.position.set(0, 0, 0);
+                    obj.rotation.y = 0;
+                    obj.rotation.x = 0;
+                    obj.scale.set(2, 2, 1);
+                }
+                if (obj.type === "Bone") {
+
+                } else if (obj.type === "SkinnedMesh") {
+                    meshes[obj.name] = obj;
+                    //  console.log("Trovata mesh:", obj.name);
+                }else if(obj.morphTargetInfluences){
+                    console.log("Trovato morph target:", obj.name);
+                    // Imposta l'influenza del morph target (ad esempio, 0.5 per metà trasformazione)
+                    obj.morphTargetInfluences[0] = 1.0; // Cambia l'indice e il valore secondo le tue esigenze
+                }
+
+            });
+            /*
+            bones["Head"].rotation.x = THREE.MathUtils.degToRad(10);
+        bones["Head"].rotation.y = THREE.MathUtils.degToRad(-5);
+        ✔ Posizione (meno comune)
+ 
+        bones["Jaw"].position.y -= 0.01;
+
+        bones["Neck"].scale.y = 1.2;*/
+            console.log("Bones trovate:", bones);
+            console.log("Meshes trovate:", meshes);
+        }, undefined, function (error) {
+            console.error(error);
+        });
+
+        console.log(scene)
+
+        // Controls for interaction
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enablePan = true;
+        controls.enableZoom = true;
+        controls.enableRotate = true;
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
     </script>
-  </body>
+</body>
+
 </html>
