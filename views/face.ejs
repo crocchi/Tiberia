@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         if (bones["Jaw_06"]) {
             // Animazione bocca: apre e chiude ogni 200ms
             mouthAnim = setInterval(() => {
-                bones["Jaw_06"].rotation.x = 0.3 + Math.sin(Date.now() * 0.01) * 0.2;
+                bones["Jaw_06"].rotation.x = 0.3 + Math.sin(Date.now() * 0.2) * 0.2;
             }, 100);
         }
     });
