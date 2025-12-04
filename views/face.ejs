@@ -13,10 +13,41 @@
             padding: 0;
             overflow: hidden;
         }
+
+        button {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 16px 32px;
+            font-size: 1.2em;
+            background: #ffeb3b;
+            color: #222;
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            z-index: 20;
+            transition: background 0.2s;
+        }
     </style>
 </head>
 
 <body>
+    <button id="playBtn">
+        ▶️ Fai parlare Spongebob!
+    </button>
+
+    color: #222;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    cursor: pointer;
+    z-index: 20;
+    transition: background 0.2s;
+    ">
+    ▶️ Fai parlare Spongebob!
+    </button>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -26,6 +57,8 @@
         // Initialize scene, camera, renderer
         let bones = {};   // qui salveremo tutte le bones
         let meshes = {}; // qui salveremo tutte le mesh
+        let audioCtx = null;
+        let source = null;
 
         let occhioDx = "Right_Top_Eyelid_017";
         let occhioSx = "Left_Top_Eyelid_014";
@@ -47,12 +80,6 @@
             const renderer = new THREE.WebGLRenderer();
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.body.appendChild(renderer.domElement);
-
-            // Avvia audio e animazione visemi al click sul canvas
-            renderer.domElement.addEventListener('click', () => {
-                // Richiedi audio e visemi al server
-                socket.emit('requestAudio', 'Ciao io sono Spongebob, e tu? COme stai in questa bellissima giornata? Spero tutto bene!');
-            });
 
             // Ambient light
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
@@ -194,6 +221,12 @@
 
 
             init();
+            const playBtn = document.getElementById('playBtn');
+            playBtn.addEventListener('click', () => {
+                playBtn.disabled = true;
+                playBtn.textContent = "🎤 Spongebob sta parlando...";
+                socket.emit('requestAudio', 'Ciao io sono Spongebob, e tu? COme stai in questa bellissima giornata? Spero tutto bene!');
+            });
 
             socket.on('audioData', ({ audioBase64, visemeSequence }) => {
                 // Decodifica il base64 in ArrayBuffer
