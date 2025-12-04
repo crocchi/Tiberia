@@ -23,9 +23,12 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
   // 1. Controlla se l'utente è già "occupato"
   if (busyUsers.has(chatId)) {
     console.log(`Richiesta in attesa per ${chatId} perché una è già in corso.`);
-    while (busyUsers.has(chatId)) {
+   // bot.sendMessage(chatId, "Sto ancora elaborando la tua ultima richiesta. Attendi un momento, per favore...");
+    /*while (busyUsers.has(chatId)) {
       await new Promise(resolve => setTimeout(resolve, 3000));
-    }
+    }*/ //troppi msg ..se nn è disponibile nn ti rip è basta...
+    //altrimenti ti manda un msg ogni 3 secondi x tutti i msg ricevuti...
+    return
   }
   // 2. Blocca l'utente
   busyUsers.add(chatId);
@@ -77,13 +80,17 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
       await new Promise(resolve => setTimeout(resolve, 1000));
       run = await client.beta.threads.runs.retrieve(threadId, run.id);
     }
-
+    let toolUsed = [];
     // GESTISCI LA RICHIESTA DI ESEGUIRE UN TOOL
     if (run.status === 'requires_action') {
       const toolCalls = run.required_action.submit_tool_outputs.tool_calls;
+      
 
       //gestisci tutte le chiamate ai tool
       const toolOutputs = await handleToolCalls(toolCalls);
+      toolUsed.push(...toolCalls.map(tc => tc.function.name));
+      toolUsed.push(...toolCalls.map(tc => tc.function.arguments));
+
 
       // Invia i risultati del tool all'assistente
       run = await client.beta.threads.runs.submitToolOutputs(threadId, run.id, {
@@ -98,6 +105,8 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
         } else if (run.status === 'requires_action') {
           const toolCalls = run.required_action.submit_tool_outputs.tool_calls;
           const toolOutputs = await handleToolCalls(toolCalls);
+      toolUsed.push(...toolCalls.map(tc => tc.function.name));
+      toolUsed.push(...toolCalls.map(tc => tc.function.arguments));
 
           run = await client.beta.threads.runs.submitToolOutputs(threadId, run.id, {
             tool_outputs: toolOutputs,
@@ -119,7 +128,7 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
         console.log(`Risposta dell'assistente per ${chatId}: ${responseText}`);
 
         // Salva l'embedding della conversazione dell'utente
-        saveUserThreadEmbedding({ chatId, userFirstName, userUsername }, { inputText, responseText }, INDEX_DB_USER, threadId);
+        saveUserThreadEmbedding({ chatId, userFirstName, userUsername }, { inputText, responseText }, INDEX_DB_USER, threadId, toolUsed);
 
         if (responseType === 'voice') {
           console.log("Generazione risposta audio...");

@@ -4,7 +4,7 @@ import { INDEX_DB_USER } from '../.devcontainer/config.js';
 import { getDateTime } from './time.js';
 import cron from 'node-cron';
 
-export async function saveUserThreadEmbedding(userinfo, messages, indexName = INDEX_DB_USER, threadId = null) {
+export async function saveUserThreadEmbedding(userinfo, messages, indexName = INDEX_DB_USER, threadId = null, toolUsed = null) {
     const { chatId, userFirstName, userUsername } = userinfo;
     const { inputText, responseText } = messages;
 
@@ -12,12 +12,19 @@ export async function saveUserThreadEmbedding(userinfo, messages, indexName = IN
     console.log(`Salvataggio embedding per utente ${chatId} nel DB ${indexName}`);
     const embedding = await generateEmbedding(threadText);
     const index = await getPineconeIndex(indexName);
+    let toolUsedString = '';
+    if(toolUsed){
+        toolUsedString = toolUsed.map(item => typeof item === 'string' ? `${item} - ` : JSON.stringify(item)).join(', ');
+
+    } else {
+        toolUsedString = 'no-tools';
+    }
 
     await index.upsert([{
         id: `${chatId}@${userUsername}[${getDateTime()}]`, // ID unico per ogni messaggio
 
         values: embedding,
-        metadata: { lastUpdate: Date.now(), threadText , threadID: threadId }
+        metadata: { lastUpdate: Date.now(), threadText , threadID: threadId , toolUsed: toolUsedString }
     }]);
 }
 
