@@ -13,15 +13,32 @@
             padding: 0;
             overflow: hidden;
         }
-        #modelAudio {
-            display: none;
-        }
+     #audio::-webkit-media-controls-panel {
+  background: transparent;
+  box-shadow: none;
+}
+
+#modelAudio::-webkit-media-controls-play-button {
+  filter: none;
+}
+
+#modelAudio::-webkit-media-controls-timeline,
+#modelAudio::-webkit-media-controls-current-time-display,
+#modelAudio::-webkit-media-controls-time-remaining-display,
+#modelAudio::-webkit-media-controls-seek-back-button,
+#modelAudio::-webkit-media-controls-seek-forward-button,
+#modelAudio::-webkit-media-controls-mute-button,
+#modelAudio::-webkit-media-controls-volume-slider,
+#modelAudio::-webkit-media-controls-fullscreen-button,
+#modelAudio::-webkit-media-controls-download-button {
+  display: none !important;
+}
     </style>
 </head>
 
 <body>
 <audio id="modelAudio" controls>
-  <source src="/audio" type="audio/mpeg">
+  <source src="data:audio/mpeg;base64,<%= audioBase64 %>" type="audio/mpeg">
   Il tuo browser non supporta l'audio.
 </audio>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -192,8 +209,25 @@ pupilla ���R_016
 
 */
 document.addEventListener('DOMContentLoaded', (event) => {
-   // const audioElement = document.getElementById('modelAudio');
+
+ const audioElement = document.getElementById('modelAudio');
     init();
+     audioElement.addEventListener('play', () => {
+        if (bones["Jaw_06"]) {
+            // Animazione bocca: apre e chiude ogni 200ms
+            mouthAnim = setInterval(() => {
+                bones["Jaw_06"].rotation.x = 0.3 + Math.sin(Date.now() * 0.01) * 0.2;
+            }, 100);
+        }
+    });
+    audioElement.addEventListener('pause', () => {
+        if (bones["Jaw_06"]) bones["Jaw_06"].rotation.x = 0;
+        clearInterval(mouthAnim);
+    });
+    audioElement.addEventListener('ended', () => {
+        if (bones["Jaw_06"]) bones["Jaw_06"].rotation.x = 0;
+        clearInterval(mouthAnim);
+    });
     /*
     audioElement.addEventListener('play', () => {
   // Esempio: apri la bocca quando parte l'audio

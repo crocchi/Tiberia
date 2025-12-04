@@ -23,9 +23,11 @@ app.get('/t', (req, res) => {
 });
 
 app.get('/', async (req, res) => {
-  //let audioBuffer = await startModelAudio();
-   //res.set('Content-Type', 'audio/mpeg');
-  res.render('face'/*,audioBuffer*/);
+  let audioBuffer = await startModelAudio();
+  // Converti il buffer in base64
+  const audioBase64 = audioBuffer.toString('base64');
+
+  res.render('face', { audioBase64 });
 });
 app.get('/s', (req, res) => {
   res.render('tiberia');
