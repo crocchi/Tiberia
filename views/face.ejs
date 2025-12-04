@@ -17,6 +17,10 @@
 </head>
 
 <body>
+    <audio id="modelAudio" controls>
+  <source src="/audio" type="audio/mpeg">
+  Il tuo browser non supporta l'audio.
+</audio>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -184,6 +188,21 @@ pupilla ���R_016
         ���L_013
 
 */
+document.addEventListener('DOMContentLoaded', (event) => {
+    const audioElement = document.getElementById('modelAudio');
+    audioElement.addEventListener('play', () => {
+  // Esempio: apri la bocca quando parte l'audio
+  if (bones["Jaw_06"]) {
+    bones["Jaw_06"].rotation.x += 0.5;
+  }
+});
+audioElement.addEventListener('pause', () => {
+  // Chiudi la bocca quando l'audio si ferma
+  if (bones["Jaw_06"]) {
+    bones["Jaw_06"].rotation.x -= 0.5;
+  }
+});
+});
     </script>
 </body>
 

@@ -6,6 +6,7 @@ import { botOnMsg,botOnVoice,botOnLocation } from './telegram.js';
 import cron from 'node-cron';
 import { fetchAndIndexEvents } from './utility/capri-events.js';
 import { loadUserThreadsFromVectorDB } from './DB/loadThreadsID.js';
+import { startModelAudio } from './utility/modelEvent.js';
 import ejs from 'ejs';
 
 
@@ -21,8 +22,10 @@ app.get('/t', (req, res) => {
   res.send('<h2>Bot Tiberia è attivo!</h2>');
 });
 
-app.get('/', (req, res) => {
-  res.render('face');
+app.get('/', async (req, res) => {
+  let audioBuffer = await startModelAudio();
+   res.set('Content-Type', 'audio/mpeg');
+  res.render('face',audioBuffer);
 });
 app.get('/s', (req, res) => {
   res.render('tiberia');
