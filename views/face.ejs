@@ -1,64 +1,70 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <title>Three.js Lip Sync</title>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Bust Animation with Three.js</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #000; }
+      html, body, canvas { height: 100%; margin: 0; padding: 0; overflow: hidden; }
     </style>
-</head>
-<body>
-<script type="module">
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.164/build/three.module.js";
-import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.164/examples/jsm/loaders/GLTFLoader.js";
-import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.164/examples/jsm/controls/OrbitControls.js";
+  </head>
+  <body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
-let scene, camera, renderer, mixer;
-let bust, jawIndex = null;
+    <script>
+      // Initialize scene, camera, renderer
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
 
-// ==== SETUP BASE ====
-scene = new THREE.Scene();
-scene.background = new THREE.Color(0x222222);
-camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 100);
-camera.position.set(0, 1.5, 2);
+      // Ambient light
+     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+     scene.add(ambientLight);
+         // Aggiungi una luce direzionale per ombreggiatura
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+      directionalLight.position.set(5, 5, 5);
+      scene.add(directionalLight);
 
-renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+      // Load GLB model
+      const loader = new THREE.GLTFLoader();
+      let model;
+        loader.load('https://tiberia.onrender.com/models/spongebob.glb', function (gltf) {
+        model = gltf.scene;
+        scene.add(model);
 
-// Lights
-const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.2);
-hemiLight.position.set(0, 20, 0);
-scene.add(hemiLight);
+        // Position and scale for bust view
+        model.position.set(0, -1, 0);
+        model.scale.set(1, 1, 1);
+           console.log(model)
+      }, undefined, function (error) {
+        console.error(error);
+      });
 
-const dirLight = new THREE.DirectionalLight(0xffffff, 1);
-dirLight.position.set(3, 10, 10);
-scene.add(dirLight);
+      console.log(scene)
+   
+      // Controls for interaction
+      const controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enablePan = true;
+      controls.enableZoom = true;
+      controls.enableRotate = true;
 
-// Controls
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.target.set(0, 1, 0);
-controls.update();
+      // Animation loop
+      function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+      }
+      animate();
 
-// ======= CARICA MODELLO =======
-const loader = new GLTFLoader();
-loader.load("https://tiberia.onrender.com/models/best.glb", (gltf) => {
-    bust = gltf.scene;
-    bust.position.y = -1;
-    scene.add(bust);
-
- 
-});
-
-
-// ======= LOOP ANIMAZIONE =======
-function animate() {
-  requestAnimationFrame(animate);
-  controls.update();
-  renderer.render(scene, camera);
-}
-
-animate();
-
-</script>
-</body>
+      // Handle window resize
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    </script>
+  </body>
 </html>
