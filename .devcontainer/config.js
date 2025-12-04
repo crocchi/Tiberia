@@ -28,7 +28,7 @@ if (!token) {
   throw new Error("Il token del bot di Telegram non è stato trovato nel file .env (TELEGRAM_BOT_TOKEN)");
 }
 
-const botPolling = { polling: false } //true per sviluppo locale, false per deploy su render.com
+const botPolling = { polling: true } //true per sviluppo locale, false per deploy su render.com
 
 const bot = new TelegramBot(token, botPolling );
 
