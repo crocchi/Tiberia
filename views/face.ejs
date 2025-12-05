@@ -240,7 +240,7 @@
                         if (visemeIdx < visemeSequence.length) {
                             const { time, viseme } = visemeSequence[visemeIdx];
                             if (bones["Jaw_06"]) {
-                                bones["Jaw_06"].rotation.x = viseme === 'open' ? 1.5 : 0.5;
+                                bones["Jaw_06"].rotation.x = viseme === 'open' ? 2 : 0.5;
                             }
                             visemeIdx++;
                             if (visemeIdx < visemeSequence.length) {
