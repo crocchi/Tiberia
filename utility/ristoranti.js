@@ -39,8 +39,8 @@ export async function getOpenRestaurantsCapri() {
 
     const url = 'https://places.googleapis.com/v1/places:searchNearby';
     const body = {
-        includedTypes: ["restaurant"],
-        maxResultCount: 20,
+        includedTypes: "restaurant",
+        //pageSize: 20,
         locationRestriction: {
             circle: {
                 center: {
