@@ -88,7 +88,7 @@
 
                 // Position and scale for bust view
                 model.position.set(0, 0, 0);
-                model.scale.set(0.2, 0.2, 0.2);
+                model.scale.set(0.1, 0.1, 0.1);
                 console.log(model)
 
                 // trova tutte le bones
@@ -223,7 +223,7 @@
         setInterval(() => {
             // Movimento casuale del naso
             blinkEyes()
-           
+           blinkNose()
         }, 2700);
         //sorriso=est bone: Jaw_06
         /*
@@ -252,12 +252,12 @@
                 if (bones[pupillaDx]) {
                     bones[pupillaDx].rotation.x = THREE.MathUtils.degToRad(30);
                     bones[occhioDx].rotation.x = THREE.MathUtils.degToRad(15);
-                    bones[bustoBone].rotation.x = THREE.MathUtils.degToRad(30);
+                    bones[bustoBone].rotation.x = THREE.MathUtils.degToRad(25);
                 }
                 if (bones[pupillaSx]) {
                     bones[pupillaSx].rotation.x = THREE.MathUtils.degToRad(30);
                     bones[occhioSx].rotation.x = THREE.MathUtils.degToRad(15);
-                    bones[bustoBone].rotation.x = THREE.MathUtils.degToRad(30);
+                    bones[bustoBone].rotation.x = THREE.MathUtils.degToRad(25);
                 }
             });
             playBtn.addEventListener('mouseout', () => {
@@ -305,7 +305,7 @@
                         console.log("Animazione bocca in corso...");
                         analyser.getByteFrequencyData(dataArray);
                         let avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
-                        bones["Jaw_06"].rotation.x = avg / 64; // valore tra 0 e ~2
+                        bones["Jaw_06"].rotation.x = avg / 50; // valore tra 0 e ~2
                         requestAnimationFrame(animateMouth);
                     }
                     mouthActive = true;
