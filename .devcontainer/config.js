@@ -45,6 +45,7 @@ const bot = new TelegramBot(token, botPolling );
 ///////////SE C R E T W I TH L O V E/////////////
 export const PINECONE_API_KEY = process.env.PINECONE_API_KEY;
 export const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
+export const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 
 //////////////////////// NOMI DB - INDEX NAME///////////////////////
 

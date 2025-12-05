@@ -7,6 +7,7 @@ import cron from 'node-cron';
 import { fetchAndIndexEvents } from './utility/capri-events.js';
 import { loadUserThreadsFromVectorDB } from './DB/loadThreadsID.js';
 import { startModelAudio } from './utility/modelEvent.js';
+import { getOpenRestaurantsCapri } from './utility/ristoranti.js';
 import ejs from 'ejs';
 
 
@@ -97,3 +98,5 @@ startEventsUpdater()
 server.listen(port, () => {
   console.log(`Bot Tiberia avviato e in ascolto sulla porta ${port}`);
 });
+
+getOpenRestaurantsCapri()
