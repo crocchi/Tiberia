@@ -16,7 +16,7 @@
 
         button {
             position: absolute;
-            top: 30px;
+            top: 60%;
             left: 50%;
             transform: translateX(-50%);
             padding: 16px 32px;
@@ -215,6 +215,25 @@
                 playBtn.disabled = true;
                 playBtn.textContent = "🎤 Spongebob sta parlando...";
                 socket.emit('requestAudio', 'Ciao io sono Spongebob, e tu? COme stai in questa bellissima giornata? Spero tutto bene!');
+            });
+
+            playBtn.addEventListener('mouseover', () => {
+           
+                    if (bones[pupillaDx]) {
+                        bones[pupillaDx].rotation.y = THREE.MathUtils.degToRad(-10);
+                    }
+                    if (bones[pupillaSx]) {
+                        bones[pupillaSx].rotation.y = THREE.MathUtils.degToRad(-10);
+                    }
+            });
+            playBtn.addEventListener('mouseout', () => {
+           
+                    if (bones[pupillaDx]) {
+                        bones[pupillaDx].rotation.y = THREE.MathUtils.degToRad(0);
+                    }
+                    if (bones[pupillaSx]) {
+                        bones[pupillaSx].rotation.y = THREE.MathUtils.degToRad(0);
+                    }
             });
 
             socket.on('audioData', ({ audioBase64, visemeSequence }) => {
