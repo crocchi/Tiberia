@@ -246,6 +246,9 @@
                             if (visemeIdx < visemeSequence.length) {
                                 const nextTime = (visemeSequence[visemeIdx].time - time) * 1000;
                                 setTimeout(animateViseme, nextTime);
+                            }else{
+                                playBtn.disabled = false;
+                                playBtn.textContent = "▶️ Fai parlare Spongebob!";
                             }
                         }
                     }
