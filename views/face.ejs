@@ -187,11 +187,11 @@
             const random = Math.random();
             if (random < 0.2) { // 20% di probabilità di chiudere gli occhi completamente
                 if (bones["Right_Top_Eyelid_017"] && bones["Left_Top_Eyelid_014"]) {
-                    bones["Right_Top_Eyelid_017"].rotation.x += 1.2;
-                    bones["Left_Top_Eyelid_014"].rotation.x += 1.2;
+                    bones["Right_Top_Eyelid_017"].rotation.x += 1.45;
+                    bones["Left_Top_Eyelid_014"].rotation.x += 1.45;
                     setTimeout(() => {
-                        bones["Right_Top_Eyelid_017"].rotation.x -= 1.2;
-                        bones["Left_Top_Eyelid_014"].rotation.x -= 1.2;
+                        bones["Right_Top_Eyelid_017"].rotation.x -= 1.45;
+                        bones["Left_Top_Eyelid_014"].rotation.x -= 1.45;
                     }, 200); // occhi chiusi per 200ms
                 }
             } else { // blink normale
@@ -234,10 +234,12 @@
                 if (bones[pupillaDx]) {
                     bones[pupillaDx].rotation.x = THREE.MathUtils.degToRad(30);
                     bones[occhioDx].rotation.x = THREE.MathUtils.degToRad(15);
+                    bones[bustoBone].rotation.x = THREE.MathUtils.degToRad(30);
                 }
                 if (bones[pupillaSx]) {
                     bones[pupillaSx].rotation.x = THREE.MathUtils.degToRad(30);
                     bones[occhioSx].rotation.x = THREE.MathUtils.degToRad(15);
+                    bones[bustoBone].rotation.x = THREE.MathUtils.degToRad(30);
                 }
             });
             playBtn.addEventListener('mouseout', () => {
@@ -245,10 +247,12 @@
                 if (bones[pupillaDx]) {
                     bones[pupillaDx].rotation.x = THREE.MathUtils.degToRad(0);
                     bones[occhioDx].rotation.x = THREE.MathUtils.degToRad(0);
+                    bones[bustoBone].rotation.x = THREE.MathUtils.degToRad(0);
                 }
                 if (bones[pupillaSx]) {
                     bones[pupillaSx].rotation.x = THREE.MathUtils.degToRad(0);
                     bones[occhioSx].rotation.x = THREE.MathUtils.degToRad(0);
+                    bones[bustoBone].rotation.x = THREE.MathUtils.degToRad(0);
                 }
             });
 
