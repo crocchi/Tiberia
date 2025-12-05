@@ -65,7 +65,7 @@
                 0.1,
                 100
             );
-            camera.position.set(0, 0, 2);// posizione camera
+            camera.position.set(0, 0, 1);// posizione camera
             //camera.lookAt(0, 0, 0);       // guarda il centro della scena
             const renderer = new THREE.WebGLRenderer();
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -180,6 +180,20 @@
             }
         };
 
+         function blinkNose() {
+            // Genera un numero casuale tra 0 e 1
+            const random = Math.random();
+            if (random < 0.2) { // 20% di probabilità di muovere il naso
+                if (bones[naso]) {
+                    bones[naso].rotation.x += 0.5;
+                    bones[naso].rotation.y += 0.5;
+                    setTimeout(() => {
+                        bones[naso].rotation.x -= 0.5;
+                        bones[naso].rotation.y -= 0.5;
+                    }, 200); // naso in movimento per 200ms
+                }
+            }
+         }
 
 
         function blinkEyes() {
@@ -192,7 +206,7 @@
                     setTimeout(() => {
                         bones["Right_Top_Eyelid_017"].rotation.x -= 1.45;
                         bones["Left_Top_Eyelid_014"].rotation.x -= 1.45;
-                    }, 200); // occhi chiusi per 200ms
+                    }, 170); // occhi chiusi per 170ms
                 }
             } else { // blink normale
                 if (bones["Right_Top_Eyelid_017"] && bones["Left_Top_Eyelid_014"]) {
@@ -206,7 +220,11 @@
             }
         }
 
-        setInterval(blinkEyes, 2700);
+        setInterval(() => {
+            // Movimento casuale del naso
+            blinkEyes()
+           
+        }, 2700);
         //sorriso=est bone: Jaw_06
         /*
           Test bone: Upper_Lip_08
