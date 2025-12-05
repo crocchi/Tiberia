@@ -65,11 +65,31 @@
                 0.1,
                 100
             );
-            camera.position.set(0, 0, 1);// posizione camera
+            camera.position.set(0, 1.5, 1);// posizione camera
             //camera.lookAt(0, 0, 0);       // guarda il centro della scena
             const renderer = new THREE.WebGLRenderer();
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.body.appendChild(renderer.domElement);
+            renderer.domElement.addEventListener('touchstart', (event) => {
+                // Prendi la posizione del tocco
+                const touch = event.touches[0];
+                const x = touch.clientX / window.innerWidth;
+                const y = touch.clientY / window.innerHeight;
+
+                // Mappa la posizione in rotazione (esempio semplice)
+                const rotY = (x - 0.5) * Math.PI * 0.5; // da -0.25π a +0.25π
+                const rotX = (0.5 - y) * Math.PI * 0.5; // da -0.25π a +0.25π
+
+                // Muovi occhi e pupille verso il punto toccato
+                if (bones[pupillaDx]) bones[pupillaDx].rotation.y = rotY;
+                if (bones[pupillaDx]) bones[pupillaDx].rotation.x = rotX;
+                if (bones[pupillaSx]) bones[pupillaSx].rotation.y = rotY;
+                if (bones[pupillaSx]) bones[pupillaSx].rotation.x = rotX;
+                if (bones[occhioDx]) bones[occhioDx].rotation.y = rotY * 0.5;
+                if (bones[occhioDx]) bones[occhioDx].rotation.x = rotX * 0.5;
+                if (bones[occhioSx]) bones[occhioSx].rotation.y = rotY * 0.5;
+                if (bones[occhioSx]) bones[occhioSx].rotation.x = rotX * 0.5;
+            });
 
             // Ambient light
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
@@ -180,7 +200,7 @@
             }
         };
 
-         function blinkNose() {
+        function blinkNose() {
             // Genera un numero casuale tra 0 e 1
             const random = Math.random();
             if (random < 0.2) { // 20% di probabilità di muovere il naso
@@ -193,7 +213,7 @@
                     }, 200); // naso in movimento per 200ms
                 }
             }
-         }
+        }
 
 
         function blinkEyes() {
@@ -223,7 +243,7 @@
         setInterval(() => {
             // Movimento casuale del naso
             blinkEyes()
-           blinkNose()
+            blinkNose()
         }, 2700);
         //sorriso=est bone: Jaw_06
         /*
@@ -247,8 +267,16 @@
                 socket.emit('requestAudio', 'Ciao io sono Spongebob, e tu? COme stai in questa bellissima giornata? Spero tutto bene!');
             });
 
-            playBtn.addEventListener('mouseover', () => {
+            // Effetto su bottone: desktop
+            playBtn.addEventListener('mouseover', moveEyesAndBusto);
+            playBtn.addEventListener('mouseout', resetEyesAndBusto);
 
+            // Effetto su bottone: mobile
+            playBtn.addEventListener('touchstart', moveEyesAndBusto);
+            playBtn.addEventListener('touchend', resetEyesAndBusto);
+
+            // Funzioni riutilizzabili
+            function moveEyesAndBusto() {
                 if (bones[pupillaDx]) {
                     bones[pupillaDx].rotation.x = THREE.MathUtils.degToRad(30);
                     bones[occhioDx].rotation.x = THREE.MathUtils.degToRad(15);
@@ -259,9 +287,9 @@
                     bones[occhioSx].rotation.x = THREE.MathUtils.degToRad(15);
                     bones[bustoBone].rotation.x = THREE.MathUtils.degToRad(25);
                 }
-            });
-            playBtn.addEventListener('mouseout', () => {
+            }
 
+            function resetEyesAndBusto() {
                 if (bones[pupillaDx]) {
                     bones[pupillaDx].rotation.x = THREE.MathUtils.degToRad(0);
                     bones[occhioDx].rotation.x = THREE.MathUtils.degToRad(0);
@@ -272,7 +300,7 @@
                     bones[occhioSx].rotation.x = THREE.MathUtils.degToRad(0);
                     bones[bustoBone].rotation.x = THREE.MathUtils.degToRad(0);
                 }
-            });
+            }
 
             let mouthActive = false;
             socket.on('audioData', ({ audioBase64, visemeSequence }) => {
@@ -305,7 +333,7 @@
                         console.log("Animazione bocca in corso...");
                         analyser.getByteFrequencyData(dataArray);
                         let avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
-                        console.log("Valore medio frequenza audio:", avg, avg/64);
+                        console.log("Valore medio frequenza audio:", avg, avg / 64);
                         bones["Jaw_06"].rotation.x = avg / 64; // valore tra 0 e ~1 per apertura bocca
                         requestAnimationFrame(animateMouth);
                     }
