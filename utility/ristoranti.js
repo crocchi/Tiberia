@@ -58,7 +58,7 @@ export async function getOpenRestaurantsCapri() {
         headers: {
             'Content-Type': 'application/json',
             'X-Goog-Api-Key': GOOGLE_API_KEY,
-            'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.openingHours,places.rating'
+            'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.currentOpeningHours,places.rating'
         },
         body: JSON.stringify(body)
     });
