@@ -181,18 +181,29 @@
 
 
 
-        function blinkEyes() {
-            if (bones["Right_Top_Eyelid_017"] && bones["Left_Top_Eyelid_014"]) {
-                // Chiudi occhi
-                bones["Right_Top_Eyelid_017"].rotation.x += 0.5;
-                bones["Left_Top_Eyelid_014"].rotation.x += 0.5;
-                setTimeout(() => {
-                    // Apri occhi
-                    bones["Right_Top_Eyelid_017"].rotation.x -= 0.5;
-                    bones["Left_Top_Eyelid_014"].rotation.x -= 0.5;
-                }, 200); // occhi chiusi per 200ms
-            }
+      function blinkEyes() {
+    // Genera un numero casuale tra 0 e 1
+    const random = Math.random();
+    if (random < 0.2) { // 20% di probabilità di chiudere gli occhi completamente
+        if (bones["Right_Top_Eyelid_017"] && bones["Left_Top_Eyelid_014"]) {
+            bones["Right_Top_Eyelid_017"].rotation.x += 1.2;
+            bones["Left_Top_Eyelid_014"].rotation.x += 1.2;
+            setTimeout(() => {
+                bones["Right_Top_Eyelid_017"].rotation.x -= 1.2;
+                bones["Left_Top_Eyelid_014"].rotation.x -= 1.2;
+            }, 350); // occhi chiusi per 350ms
         }
+    } else { // blink normale
+        if (bones["Right_Top_Eyelid_017"] && bones["Left_Top_Eyelid_014"]) {
+            bones["Right_Top_Eyelid_017"].rotation.x += 0.6;
+            bones["Left_Top_Eyelid_014"].rotation.x += 0.6;
+            setTimeout(() => {
+                bones["Right_Top_Eyelid_017"].rotation.x -= 0.6;
+                bones["Left_Top_Eyelid_014"].rotation.x -= 0.6;
+            }, 200); // occhi chiusi per 200ms
+        }
+    }
+}
 
         setInterval(blinkEyes, 2700);
         //sorriso=est bone: Jaw_06
