@@ -65,7 +65,7 @@
                 0.1,
                 100
             );
-            camera.position.set(2, 2, 2);// posizione camera
+            camera.position.set(0, 0, 2);// posizione camera
             const renderer = new THREE.WebGLRenderer();
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.body.appendChild(renderer.domElement);
@@ -251,6 +251,7 @@
                 }
             });
 
+            let mouthActive = false;
             socket.on('audioData', ({ audioBase64, visemeSequence }) => {
                 // Decodifica il base64 in ArrayBuffer
                 const binary = atob(audioBase64);
@@ -275,34 +276,25 @@
                     let dataArray = new Uint8Array(analyser.frequencyBinCount);
 
                     // Avvia animazione visemi sincronizzata
-                    let visemeIdx = 0;
-                    function animateViseme() {
-                        if (visemeIdx < visemeSequence.length) {
-                            const { time, viseme } = visemeSequence[visemeIdx];
-                            if (bones["Jaw_06"]) {
-                                bones["Jaw_06"].rotation.x = viseme === 'open' ? 2 : 0.5;
-                            }
-                            visemeIdx++;
-                            if (visemeIdx < visemeSequence.length) {
-                                const nextTime = (visemeSequence[visemeIdx].time - time) * 1000;
-                                setTimeout(animateViseme, nextTime);
-                            } else {
-                                if (bones["Jaw_06"]) bones["Jaw_06"].rotation.x = 0.5;
-                                playBtn.disabled = false;
-                                playBtn.textContent = "▶️ Fai parlare Spongebob!";
-                            }
-                        }
-                    }
-
+                    let mouthActive = false;
                     function animateMouth() {
+                        if (!mouthActive) return; // esci dal ciclo se la bocca non deve più muoversi
                         console.log("Animazione bocca in corso...");
                         analyser.getByteFrequencyData(dataArray);
                         let avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
-                        bones["Jaw_06"].rotation.x = avg / 256; // valore tra 0 e ~1
+                        bones["Jaw_06"].rotation.x = avg / 128; // valore tra 0 e ~2
                         requestAnimationFrame(animateMouth);
                     }
+                    mouthActive = true;
+                    animateMouth();
 
-                   animateMouth();
+                    // Gestione fine audio
+                    source.onended = () => {
+                        mouthActive = false;
+                        if (bones["Jaw_06"]) bones["Jaw_06"].rotation.x = 0.5; // posizione di riposo
+                        playBtn.disabled = false;
+                        playBtn.textContent = "▶️ Fai parlare Spongebob!";
+                    };
                 });
 
             });
