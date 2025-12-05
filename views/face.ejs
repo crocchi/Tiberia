@@ -65,7 +65,7 @@
                 0.1,
                 100
             );
-            camera.position.set(0, 1.5, 1);// posizione camera
+            camera.position.set(0, 1, 1);// posizione camera
             //camera.lookAt(0, 0, 0);       // guarda il centro della scena
             const renderer = new THREE.WebGLRenderer();
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -203,7 +203,7 @@
         function blinkNose() {
             // Genera un numero casuale tra 0 e 1
             const random = Math.random();
-            if (random < 0.2) { // 20% di probabilità di muovere il naso
+            if (random < 0.1) { // 10% di probabilità di muovere il naso
                 if (bones[naso]) {
                     bones[naso].rotation.x += 0.5;
                     bones[naso].rotation.y += 0.5;
