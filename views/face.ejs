@@ -65,7 +65,7 @@
                 0.1,
                 100
             );
-            camera.position.set(1.5, 1.5, 2.5);// posizione camera
+            camera.position.set(1.5, 1.5, 1.5);// posizione camera
             const renderer = new THREE.WebGLRenderer();
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.body.appendChild(renderer.domElement);
@@ -181,29 +181,29 @@
 
 
 
-      function blinkEyes() {
-    // Genera un numero casuale tra 0 e 1
-    const random = Math.random();
-    if (random < 0.2) { // 20% di probabilità di chiudere gli occhi completamente
-        if (bones["Right_Top_Eyelid_017"] && bones["Left_Top_Eyelid_014"]) {
-            bones["Right_Top_Eyelid_017"].rotation.x += 1.2;
-            bones["Left_Top_Eyelid_014"].rotation.x += 1.2;
-            setTimeout(() => {
-                bones["Right_Top_Eyelid_017"].rotation.x -= 1.2;
-                bones["Left_Top_Eyelid_014"].rotation.x -= 1.2;
-            }, 350); // occhi chiusi per 350ms
+        function blinkEyes() {
+            // Genera un numero casuale tra 0 e 1
+            const random = Math.random();
+            if (random < 0.2) { // 20% di probabilità di chiudere gli occhi completamente
+                if (bones["Right_Top_Eyelid_017"] && bones["Left_Top_Eyelid_014"]) {
+                    bones["Right_Top_Eyelid_017"].rotation.x += 1.2;
+                    bones["Left_Top_Eyelid_014"].rotation.x += 1.2;
+                    setTimeout(() => {
+                        bones["Right_Top_Eyelid_017"].rotation.x -= 1.2;
+                        bones["Left_Top_Eyelid_014"].rotation.x -= 1.2;
+                    }, 350); // occhi chiusi per 350ms
+                }
+            } else { // blink normale
+                if (bones["Right_Top_Eyelid_017"] && bones["Left_Top_Eyelid_014"]) {
+                    bones["Right_Top_Eyelid_017"].rotation.x += 0.6;
+                    bones["Left_Top_Eyelid_014"].rotation.x += 0.6;
+                    setTimeout(() => {
+                        bones["Right_Top_Eyelid_017"].rotation.x -= 0.6;
+                        bones["Left_Top_Eyelid_014"].rotation.x -= 0.6;
+                    }, 200); // occhi chiusi per 200ms
+                }
+            }
         }
-    } else { // blink normale
-        if (bones["Right_Top_Eyelid_017"] && bones["Left_Top_Eyelid_014"]) {
-            bones["Right_Top_Eyelid_017"].rotation.x += 0.6;
-            bones["Left_Top_Eyelid_014"].rotation.x += 0.6;
-            setTimeout(() => {
-                bones["Right_Top_Eyelid_017"].rotation.x -= 0.6;
-                bones["Left_Top_Eyelid_014"].rotation.x -= 0.6;
-            }, 200); // occhi chiusi per 200ms
-        }
-    }
-}
 
         setInterval(blinkEyes, 2700);
         //sorriso=est bone: Jaw_06
@@ -229,22 +229,26 @@
             });
 
             playBtn.addEventListener('mouseover', () => {
-           
-                    if (bones[pupillaDx]) {
-                        bones[pupillaDx].rotation.x = THREE.MathUtils.degToRad(30);
-                    }
-                    if (bones[pupillaSx]) {
-                        bones[pupillaSx].rotation.x = THREE.MathUtils.degToRad(30);
-                    }
+
+                if (bones[pupillaDx]) {
+                    bones[pupillaDx].rotation.x = THREE.MathUtils.degToRad(30);
+                    bones[occhioDx].rotation.x = THREE.MathUtils.degToRad(15);
+                }
+                if (bones[pupillaSx]) {
+                    bones[pupillaSx].rotation.x = THREE.MathUtils.degToRad(30);
+                    bones[occhioSx].rotation.x = THREE.MathUtils.degToRad(15);
+                }
             });
             playBtn.addEventListener('mouseout', () => {
-           
-                    if (bones[pupillaDx]) {
-                        bones[pupillaDx].rotation.x = THREE.MathUtils.degToRad(0);
-                    }
-                    if (bones[pupillaSx]) {
-                        bones[pupillaSx].rotation.x = THREE.MathUtils.degToRad(0);
-                    }
+
+                if (bones[pupillaDx]) {
+                    bones[pupillaDx].rotation.x = THREE.MathUtils.degToRad(0);
+                    bones[occhioDx].rotation.x = THREE.MathUtils.degToRad(0);
+                }
+                if (bones[pupillaSx]) {
+                    bones[pupillaSx].rotation.x = THREE.MathUtils.degToRad(0);
+                    bones[occhioSx].rotation.x = THREE.MathUtils.degToRad(0);
+                }
             });
 
             socket.on('audioData', ({ audioBase64, visemeSequence }) => {
@@ -255,7 +259,7 @@
                 for (let i = 0; i < len; i++) {
                     buffer[i] = binary.charCodeAt(i);
                 }
-
+                console.log("Viseme Sequence ricevuta:", visemeSequence);
                 // Usa AudioContext per riprodurre l'audio
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 audioCtx.decodeAudioData(buffer.buffer, (audioBuffer) => {
@@ -263,6 +267,12 @@
                     source.buffer = audioBuffer;
                     source.connect(audioCtx.destination);
                     source.start();
+
+                    //analizza audio per movimento bocca
+                    const analyser = audioCtx.createAnalyser();
+                    source.connect(analyser);
+                    analyser.connect(audioCtx.destination);
+                    let dataArray = new Uint8Array(analyser.frequencyBinCount);
 
                     // Avvia animazione visemi sincronizzata
                     let visemeIdx = 0;
@@ -276,13 +286,23 @@
                             if (visemeIdx < visemeSequence.length) {
                                 const nextTime = (visemeSequence[visemeIdx].time - time) * 1000;
                                 setTimeout(animateViseme, nextTime);
-                            }else{
+                            } else {
+                                if (bones["Jaw_06"]) bones["Jaw_06"].rotation.x = 0.5;
                                 playBtn.disabled = false;
                                 playBtn.textContent = "▶️ Fai parlare Spongebob!";
                             }
                         }
                     }
-                    animateViseme();
+
+                    function animateMouth() {
+                        console.log("Animazione bocca in corso...");
+                        analyser.getByteFrequencyData(dataArray);
+                        let avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+                        bones["Jaw_06"].rotation.x = avg / 256; // valore tra 0 e ~1
+                        requestAnimationFrame(animateMouth);
+                    }
+
+                   animateMouth();
                 });
 
             });
