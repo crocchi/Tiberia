@@ -220,19 +220,19 @@
             playBtn.addEventListener('mouseover', () => {
            
                     if (bones[pupillaDx]) {
-                        bones[pupillaDx].rotation.y = THREE.MathUtils.degToRad(-10);
+                        bones[pupillaDx].rotation.x = THREE.MathUtils.degToRad(30);
                     }
                     if (bones[pupillaSx]) {
-                        bones[pupillaSx].rotation.y = THREE.MathUtils.degToRad(-10);
+                        bones[pupillaSx].rotation.x = THREE.MathUtils.degToRad(30);
                     }
             });
             playBtn.addEventListener('mouseout', () => {
            
                     if (bones[pupillaDx]) {
-                        bones[pupillaDx].rotation.y = THREE.MathUtils.degToRad(0);
+                        bones[pupillaDx].rotation.x = THREE.MathUtils.degToRad(0);
                     }
                     if (bones[pupillaSx]) {
-                        bones[pupillaSx].rotation.y = THREE.MathUtils.degToRad(0);
+                        bones[pupillaSx].rotation.x = THREE.MathUtils.degToRad(0);
                     }
             });
 
