@@ -72,6 +72,6 @@ export async function getOpenRestaurantsCapri() {
         rating: place.rating,
         openingHours: place.openingHours
     }));*/
-    console.log("Ristoranti aperti a Capri:", data);
+    console.log("Ristoranti aperti a Capri:", JSON.stringify(data));
     return data;
 }
