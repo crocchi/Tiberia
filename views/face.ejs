@@ -229,6 +229,16 @@
                         bones["Right_Top_Eyelid_017"].rotation.x -= 1.45;
                         bones["Left_Top_Eyelid_014"].rotation.x -= 1.45;
                     }, 170); // occhi chiusi per 170ms
+
+                    setTimeout(() => {
+                        bones["Right_Top_Eyelid_017"].rotation.x += 1.45;
+                        bones["Left_Top_Eyelid_014"].rotation.x += 1.45;
+                    }, 320); // occhi chiusi per 320ms
+
+                    setTimeout(() => {
+                        bones["Right_Top_Eyelid_017"].rotation.x -= 1.45;
+                        bones["Left_Top_Eyelid_014"].rotation.x -= 1.45;
+                    }, 560); // occhi chiusi per 560ms
                 }
             } else { // blink normale
                 if (bones["Right_Top_Eyelid_017"] && bones["Left_Top_Eyelid_014"]) {
