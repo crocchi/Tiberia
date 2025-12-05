@@ -283,7 +283,7 @@
                         console.log("Animazione bocca in corso...");
                         analyser.getByteFrequencyData(dataArray);
                         let avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
-                        bones["Jaw_06"].rotation.x = avg / 128; // valore tra 0 e ~2
+                        bones["Jaw_06"].rotation.x = avg / 64; // valore tra 0 e ~2
                         requestAnimationFrame(animateMouth);
                     }
                     mouthActive = true;
