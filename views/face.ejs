@@ -339,7 +339,7 @@
                         analyser.getByteFrequencyData(dataArray);
                         let avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
                         console.log("Valore medio frequenza audio:", avg, avg / 64);
-                        bones["Jaw_06"].rotation.x = avg / 58; // valore tra 0 e ~1 per apertura bocca
+                        bones["Jaw_06"].rotation.x = avg / 54; // valore tra 0 e ~1 per apertura bocca
                         requestAnimationFrame(animateMouth);
                     }
                     mouthActive = true;
