@@ -80,7 +80,7 @@ function startEventsUpdater() {
     loadUserThreadsFromVectorDB()
 
     // Programma l'esecuzione ogni ora per catturare nuovi eventi durante il giorno
-    cron.schedule('00 00 * * *', () => {
+    cron.schedule('30 02 * * *', () => {
         console.log('Esecuzione del task orario per gli eventi.ore 23:30');
         fetchAndIndexEvents([6], INDEX_DB_EVENTS); //fetchano eventi del giorno
         fetchAndIndexEvents([3,4,7], INDEX_DB_NEWS); //fetchano newsgenerali
@@ -99,4 +99,4 @@ server.listen(port, () => {
   console.log(`Bot Tiberia avviato e in ascolto sulla porta ${port}`);
 });
 
-getOpenRestaurantsCapri()
+//getOpenRestaurantsCapri()
