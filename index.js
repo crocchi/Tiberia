@@ -72,16 +72,18 @@ function startEventsUpdater() {
     const updateEnd='2025/12/06';
 
     // inizializza il DB VECTOR startup
-    fetchAndIndexEvents([3,4,5,7],INDEX_DB_NEWS,updateStart,updateEnd,80);//init DB
-    fetchAndIndexEvents([6], INDEX_DB_EVENTS, updateStart,updateEnd,100);//init DB
+    //fetchAndIndexEvents([3,4,5,7],INDEX_DB_NEWS,updateStart,updateEnd,80);//init DB
+    //fetchAndIndexEvents([6], INDEX_DB_EVENTS, updateStart,updateEnd,100);//init DB
     //fetchAndIndexEvents(categorie scelte,database name,data start, data end, quantita);//init DB eventi odierni
 
     // Carica i thread esistenti dal DB vettoriale
     loadUserThreadsFromVectorDB()
 
     // Programma l'esecuzione ogni ora per catturare nuovi eventi durante il giorno
-    cron.schedule('10 03 * * *', () => {
+    cron.schedule('30 13 * * *', () => {
         console.log('Esecuzione del task orario per gli eventi.ore 23:30');
+        //bud..la data va settata in base al giorno corrente 0re 03:10 6 dicembre
+        //Intervallo di date per il fetch: da 2025-12-06T00:00:00.000Z a 2025-12-07T00:00:00.000Z
         fetchAndIndexEvents([6], INDEX_DB_EVENTS); //fetchano eventi del giorno
         fetchAndIndexEvents([3,4,7], INDEX_DB_NEWS); //fetchano newsgenerali
     }, {
