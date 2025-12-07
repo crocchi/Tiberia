@@ -6,6 +6,7 @@ import { getDateTime } from './utility/time.js';
 import { INDEX_DB_EVENTS, INDEX_DB_NEWS, INDEX_DB_WEATHER, INDEX_DB_USER } from './.devcontainer/config.js';
 import { getWeather } from './utility/getWeather.js';
 import { saveUserThreadEmbedding } from './utility/social.js';
+import fetch from 'node-fetch';
 
 // Set per tenere traccia degli utenti che hanno una richiesta in corso
 export const busyUsers = new Set();
@@ -23,7 +24,7 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
   // 1. Controlla se l'utente è già "occupato"
   if (busyUsers.has(chatId)) {
     console.log(`Richiesta in attesa per ${chatId} perché una è già in corso.`);
-   // bot.sendMessage(chatId, "Sto ancora elaborando la tua ultima richiesta. Attendi un momento, per favore...");
+    // bot.sendMessage(chatId, "Sto ancora elaborando la tua ultima richiesta. Attendi un momento, per favore...");
     /*while (busyUsers.has(chatId)) {
       await new Promise(resolve => setTimeout(resolve, 3000));
     }*/ //troppi msg ..se nn è disponibile nn ti rip è basta...
@@ -84,7 +85,7 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
     // GESTISCI LA RICHIESTA DI ESEGUIRE UN TOOL
     if (run.status === 'requires_action') {
       const toolCalls = run.required_action.submit_tool_outputs.tool_calls;
-      
+
 
       //gestisci tutte le chiamate ai tool
       const toolOutputs = await handleToolCalls(toolCalls);
@@ -105,8 +106,8 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
         } else if (run.status === 'requires_action') {
           const toolCalls = run.required_action.submit_tool_outputs.tool_calls;
           const toolOutputs = await handleToolCalls(toolCalls);
-      toolUsed.push(...toolCalls.map(tc => tc.function.name));
-      toolUsed.push(...toolCalls.map(tc => tc.function.arguments));
+          toolUsed.push(...toolCalls.map(tc => tc.function.name));
+          toolUsed.push(...toolCalls.map(tc => tc.function.arguments));
 
           run = await client.beta.threads.runs.submitToolOutputs(threadId, run.id, {
             tool_outputs: toolOutputs,
@@ -122,6 +123,9 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
     if (run.status === 'completed') {
       const messages = await client.beta.threads.messages.list(threadId);
       const assistantResponse = messages.data.find(m => m.role === 'assistant');
+      // Cerca attachment/file nella risposta
+      const fileContent = assistantResponse.content.find(c => c.type === 'file');
+
 
       if (assistantResponse && assistantResponse.content[0].type === 'text') {
         const responseText = assistantResponse.content[0].text.value;
@@ -144,6 +148,18 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
             contentType: 'audio/mpeg',
           });
           console.log(`Risposta audio inviata a ${chatId}.`);
+        } if (fileContent) {
+          console.log("Risposta contiene un file, preparazione invio...");
+          const fileId = fileContent.file_id;
+          // Scarica il file da OpenAI
+          const file = await client.files.retrieve(fileId);
+          const fileUrl = file.download_url; // oppure usa file.content se disponibile
+
+          // Scarica il file come buffer
+          const response = await fetch(fileUrl);
+          const fileBuffer = await response.buffer();
+          // Invia il file su Telegram
+          await bot.sendDocument(chatId, fileBuffer, {}, { filename: 'output.pdf' });
         } else {
           await bot.sendMessage(chatId, responseText);
           console.log(`Risposta testuale inviata a ${chatId}.`);
@@ -186,6 +202,12 @@ async function handleToolCalls(toolCalls) {
     } else if (functionName === 'searchWeather') {
       const searchResults = await findSimilarItems(args.queryText, 3, INDEX_DB_WEATHER);
       output = JSON.stringify(searchResults);
+    } else if (functionName === 'code_interpreter') {
+      // Qui non devi fare nulla: la risposta viene gestita direttamente da OpenAI
+      // Puoi semplicemente restituire un oggetto vuoto o loggare l'evento
+      output = ""; // oppure output = null;
+    } else {
+      output = `<${functionName}>`;
     }
 
     if (output) {

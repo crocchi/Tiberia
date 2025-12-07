@@ -116,4 +116,58 @@ Ristoranti aperti a Capri: {"places":
 
 // excel online open ristaoranti
 
-// ID= 1k6iI0KMs39k-V4mMKjJq34aO5xvBy-YLfqUlZ8lsxh0
+// IDexcel= 1k6iI0KMs39k-V4mMKjJq34aO5xvBy-YLfqUlZ8lsxh0
+/*
+3. Abilita Google Sheets API
+Vai su Google Cloud Console.
+Crea un progetto (se non ne hai uno).
+Vai su API & Services > Library.
+Cerca Google Sheets API e abilitala.
+Vai su API & Services > Credentials.
+Crea una API Key (per test) oppure OAuth2 Client ID (per produzione).
+4. Installa la libreria Google API
+Nel terminale:
+npm install googleapis
+
+5. Leggi i dati dal foglio (Node.js)
+Esempio di funzione per leggere solo i ristoranti aperti:
+
+import { google } from 'googleapis';
+
+const SHEET_ID = 'TUO_ID_FOGLIO'; // Sostituisci con l'ID del tuo foglio
+const API_KEY = 'TUO_API_KEY';    // Sostituisci con la tua API key
+
+export async function getOpenRestaurantsFromSheet() {
+    const sheets = google.sheets({ version: 'v4', auth: API_KEY });
+    // Leggi i dati (es: dalla tab "Ristoranti" righe A2:E)
+    const res = await sheets.spreadsheets.values.get({
+        spreadsheetId: SHEET_ID,
+        range: 'Ristoranti!A2:E', // Cambia nome tab/range se necessario
+    });
+
+    // Filtra solo quelli aperti
+    const rows = res.data.values || [];
+    return rows
+        .filter(row => row[3] === 'TRUE' || row[3] === 'true') // colonna "Aperto"
+        .map(row => ({
+            name: row[0],
+            address: row[1],
+            rating: row[2],
+            open: row[3],
+            hours: row[4]
+        }));
+}
+
+1 vulnerability
+6. Usa la funzione nel tuo backend
+Così puoi aggiornare il foglio online e il tuo backend leggerà sempre i dati aggiornati!
+Se vuoi anche la scrittura o la modifica dei dati, puoi usare le stesse API.
+Vuoi vedere anche come filtrare per orario o altre colonne?
+
+import { getOpenRestaurantsFromSheet } from './utility/ristorantiSheet.js';
+
+app.get('/ristoranti-aperti', async (req, res) => {
+    const ristoranti = await getOpenRestaurantsFromSheet();
+    res.json(ristoranti);
+});
+*/
