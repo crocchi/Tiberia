@@ -203,6 +203,7 @@ async function handleToolCalls(toolCalls) {
       const searchResults = await findSimilarItems(args.queryText, 3, INDEX_DB_WEATHER);
       output = JSON.stringify(searchResults);
     } else if (functionName === 'code_interpreter') {
+      console.log("Esecuzione di code_interpreter, nessun output da restituire.");
       // Qui non devi fare nulla: la risposta viene gestita direttamente da OpenAI
       // Puoi semplicemente restituire un oggetto vuoto o loggare l'evento
       output = ""; // oppure output = null;
