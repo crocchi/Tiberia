@@ -86,8 +86,9 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
     if (run.status === 'requires_action') {
       const toolCalls = run.required_action.submit_tool_outputs.tool_calls;
 
-      await bot.sendMessage(chatId, `Tool richiesti: ${toolCalls.map(tc => tc.function.name).join(', ')}. Query:Sto recuperando le informazioni...`);
       console.log("Tool calls:", toolCalls);
+      await bot.sendMessage(chatId, `Tool richiesti: ${toolCalls.map(tc => tc.function.name).join(', ')}. Query: ${toolCalls.map(tc => tc.function.arguments).join(', ')}. Sto recuperando le informazioni...`);
+
       /*Tool calls: [
   {
     id: 'call_sotiSiiuw6WOM0M0gfYgkiNc',
