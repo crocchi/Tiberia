@@ -25,28 +25,25 @@ tartOfDay: '2025-11-30T23:00:00.000Z', endOfDay: '2025-12-01T23:00:00.000Z'}
 */
 function getTodayDateRange(startDateStr, endDateStr) {
 //getTodayDateRange('2025/12/01','2025/12/05')
-  let now,endOfDay;
-  if(startDateStr){
+  let now,endOfDay,startOfDay;
+  if(startDateStr){//quando hai le date..imposto il range date
 
     now = new Date(startDateStr);
-  }else{
+    startOfDay = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Rome" }));
+     //data impostata come args = Mon Dec 08 2025 21:41:39 GMT+0100 (Ora standard dell’Europa centrale)
+    endOfDay = new Date(endDateStr);
+  }else{//x quando fà gli aggiornamenti giornalieri..che nn ha date in args
     now = new Date();
+    startOfDay = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Rome" }));
+     //Mon Dec 08 2025 21:41:39 GMT+0100 (Ora standard dell’Europa centrale)
+     //imposto la data al giorno prima
+    startOfDay.setDate(startOfDay.getDate() - 1)
+
+    //reimposto startofday +1(xkè mandato -1 prima..) +1 
+     endOfDay = new Date(startOfDay.getDate() + 2);
   }
-  
+  //startOfDay.setDate(startOfDay.getDate() - 1)
     
-    // Imposta l'inizio del giorno (mezzanotte) a Roma
-    const startOfDay = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Rome" }));
-    startOfDay.setHours(0, 0, 0, 0);
-
-    if(endDateStr){
-      endOfDay = new Date(endDateStr);
-    }else{
-       endOfDay = new Date(startOfDay);
-    }
-
-    // Imposta la fine del giorno (mezzanotte del giorno dopo)
-   
-    endOfDay.setDate(endOfDay.getDate() + 1);
 
     return {
         startOfDay: startOfDay.toISOString(),
@@ -68,7 +65,7 @@ function getTodayDateRange(startDateStr, endDateStr) {
 /**https://www.capripost.it/wp-json/wp/v2/posts?categories=7&after=2025-11-30T00:00:00
  * Scarica gli eventi del giorno, li processa e li salva su Pinecone.
  */
-export async function fetchAndIndexEvents(categoryID=[6],indexDBName=INDEX_DB_EVENTS,startDay, endDay,qnt=qntNews) {
+export async function fetchAndIndexEvents(categoryID=[6],indexDBName=INDEX_DB_EVENTS,startDay=null, endDay=null,qnt=qntNews) {
     console.log('Esecuzione task: aggiornamento eventi di Capri...');
 
     const { startOfDay, endOfDay } = getTodayDateRange(startDay, endDay);

@@ -80,10 +80,10 @@ function startEventsUpdater() {
     loadUserThreadsFromVectorDB()
 
     // Programma l'esecuzione ogni ora per catturare nuovi eventi durante il giorno
-    cron.schedule('30 13 * * *', () => {
+    cron.schedule('30 22 * * *', () => {
         console.log('Esecuzione del task orario per gli eventi.ore 23:30');
-        //bud..la data va settata in base al giorno corrente 0re 03:10 6 dicembre
-        //Intervallo di date per il fetch: da 2025-12-06T00:00:00.000Z a 2025-12-07T00:00:00.000Z
+        //bud..la data va settata in base al giorno corrente 0re 03:10 8 dicembre
+        //Intervallo di date per il fetch: da 2025-12-08T00:00:00.000Z a 2025-12-09T00:00:00.000Z
         fetchAndIndexEvents([6], INDEX_DB_EVENTS); //fetchano eventi del giorno
         fetchAndIndexEvents([3,4,7], INDEX_DB_NEWS); //fetchano newsgenerali
     }, {
