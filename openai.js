@@ -145,7 +145,7 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
             contentType: 'audio/mpeg',
           });
           console.log(`Risposta audio inviata a ${chatId}.`);
-        } if (fileContent) {
+        } /*if (fileContent) {
           console.log("Risposta contiene un file, preparazione invio...");
           const fileId = fileContent.file_id;
           // Scarica il file da OpenAI
@@ -157,7 +157,7 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
           const fileBuffer = await response.buffer();
           // Invia il file su Telegram
           await bot.sendDocument(chatId, fileBuffer, {}, { filename: 'output.pdf' });
-        } else {
+        }*/ else {
           await bot.sendMessage(chatId, responseText);
           console.log(`Risposta testuale inviata a ${chatId}.`);
         }
