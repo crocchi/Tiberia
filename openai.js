@@ -81,18 +81,17 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
       await new Promise(resolve => setTimeout(resolve, 1000));
       run = await client.beta.threads.runs.retrieve(threadId, run.id);
     }
-    let toolUsed = [];
+    
     // GESTISCI LA RICHIESTA DI ESEGUIRE UN TOOL
     if (run.status === 'requires_action') {
       const toolCalls = run.required_action.submit_tool_outputs.tool_calls;
 
-
+      console.log("Tool calls:", toolCalls);
       //gestisci tutte le chiamate ai tool
       const toolOutputs = await handleToolCalls(toolCalls);
-      toolUsed.push(...toolCalls.map(tc => tc.function.name));
-      toolUsed.push(...toolCalls.map(tc => tc.function.arguments));
 
-
+      console.log("Tool outputs ottenuti:", toolOutputs);
+      
       // Invia i risultati del tool all'assistente
       run = await client.beta.threads.runs.submitToolOutputs(threadId, run.id, {
         tool_outputs: toolOutputs,
@@ -106,8 +105,6 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
         } else if (run.status === 'requires_action') {
           const toolCalls = run.required_action.submit_tool_outputs.tool_calls;
           const toolOutputs = await handleToolCalls(toolCalls);
-          toolUsed.push(...toolCalls.map(tc => tc.function.name));
-          toolUsed.push(...toolCalls.map(tc => tc.function.arguments));
 
           run = await client.beta.threads.runs.submitToolOutputs(threadId, run.id, {
             tool_outputs: toolOutputs,
@@ -124,7 +121,7 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
       const messages = await client.beta.threads.messages.list(threadId);
       const assistantResponse = messages.data.find(m => m.role === 'assistant');
       // Cerca attachment/file nella risposta
-      const fileContent = assistantResponse.content.find(c => c.type === 'file');
+      //const fileContent = assistantResponse.content.find(c => c.type === 'file');
 
 
       if (assistantResponse && assistantResponse.content[0].type === 'text') {
@@ -182,6 +179,8 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
 
 async function handleToolCalls(toolCalls) {
   const toolOutputs = [];
+  let toolUsedForTunning = [];
+
   for (const toolCall of toolCalls) {
     const functionName = toolCall.function.name;
     const args = JSON.parse(toolCall.function.arguments);
@@ -189,6 +188,7 @@ async function handleToolCalls(toolCalls) {
 
     console.log(`Esecuzione tool ${functionName} con argomenti:`, args);
     if (functionName === 'getFerryTimes') {
+      //toolUsedForTunning[]
       output = await fetchFerryTime(args.trattaKey);
     } else if (functionName === 'searchNews') {
       const searchResults = await findSimilarItems(args.queryText, 3, INDEX_DB_NEWS);
