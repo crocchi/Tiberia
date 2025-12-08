@@ -91,7 +91,7 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
       const toolOutputs = await handleToolCalls(toolCalls);
 
       console.log("Tool outputs ottenuti:", toolOutputs);
-      
+
       // Invia i risultati del tool all'assistente
       run = await client.beta.threads.runs.submitToolOutputs(threadId, run.id, {
         tool_outputs: toolOutputs,
@@ -129,7 +129,7 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
         console.log(`Risposta dell'assistente per ${chatId}: ${responseText}`);
 
         // Salva l'embedding della conversazione dell'utente
-        saveUserThreadEmbedding({ chatId, userFirstName, userUsername }, { inputText, responseText }, INDEX_DB_USER, threadId, toolUsed);
+       // saveUserThreadEmbedding({ chatId, userFirstName, userUsername }, { inputText, responseText }, INDEX_DB_USER, threadId, "test-fine-tunning");
 
         if (responseType === 'voice') {
           console.log("Generazione risposta audio...");
