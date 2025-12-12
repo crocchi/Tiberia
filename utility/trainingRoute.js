@@ -1,17 +1,5 @@
 // Elimina una riga dal dataset dato l'indice
-router.post('/delete', (req, res) => {
-    const { index } = req.body;
-    if (typeof index !== 'number') return res.status(400).json({ error: 'Indice mancante' });
-    try {
-        const lines = fs.readFileSync(datasetPath, 'utf8').split('\n').filter(Boolean);
-        if (index < 0 || index >= lines.length) return res.status(400).json({ error: 'Indice fuori range' });
-        lines.splice(index, 1);
-        fs.writeFileSync(datasetPath, lines.join('\n') + (lines.length ? '\n' : ''));
-        res.json({ success: true });
-    } catch (e) {
-        res.status(500).json({ error: 'Errore eliminazione riga' });
-    }
-});
+
 // Express route per visualizzare il file JSONL del dataset di training
 import fs from 'fs';
 import path from 'path';
@@ -35,6 +23,20 @@ router.get('/training/json', (req, res) => {
     const lines = fs.readFileSync(DATASET_FILE, 'utf8').split('\n').filter(Boolean);
     const data = lines.map(line => JSON.parse(line));
     res.json(data);
+});
+
+router.post('/delete', (req, res) => {
+    const { index } = req.body;
+    if (typeof index !== 'number') return res.status(400).json({ error: 'Indice mancante' });
+    try {
+        const lines = fs.readFileSync(datasetPath, 'utf8').split('\n').filter(Boolean);
+        if (index < 0 || index >= lines.length) return res.status(400).json({ error: 'Indice fuori range' });
+        lines.splice(index, 1);
+        fs.writeFileSync(datasetPath, lines.join('\n') + (lines.length ? '\n' : ''));
+        res.json({ success: true });
+    } catch (e) {
+        res.status(500).json({ error: 'Errore eliminazione riga' });
+    }
 });
 
 router.post('/training/update', express.json(), (req, res) => {
