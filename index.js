@@ -7,6 +7,7 @@ import cron from 'node-cron';
 import { fetchAndIndexEvents } from './utility/capri-events.js';
 import { loadUserThreadsFromVectorDB } from './DB/loadThreadsID.js';
 import { startModelAudio } from './utility/modelEvent.js';
+import trainingRoute from './utility/trainingRoute.js';
 import { getOpenRestaurantsCapri } from './utility/ristoranti.js';
 import ejs from 'ejs';
 
@@ -33,8 +34,6 @@ io.on('connection', (socket) => {
   });
 });
 
-
-
 app.get('/s', (req, res) => {
   res.render('tiberia');
 });
@@ -59,6 +58,8 @@ app.set('views', path.join(process.cwd(), 'views'));
 
 // Servi file statici dalla cartella models
 app.use('/models', express.static(path.join(process.cwd(), 'models')));
+
+app.use(trainingRoute);
 
 
 

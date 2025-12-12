@@ -7,6 +7,7 @@ import { INDEX_DB_EVENTS, INDEX_DB_NEWS, INDEX_DB_WEATHER, INDEX_DB_USER } from 
 import { getWeather } from './utility/getWeather.js';
 import { saveUserThreadEmbedding } from './utility/social.js';
 import fetch from 'node-fetch';
+import {addTrainingFile} from './info tiberia/createDataset.js';
 
 // Set per tenere traccia degli utenti che hanno una richiesta in corso
 export const busyUsers = new Set();
@@ -87,7 +88,7 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
       const toolCalls = run.required_action.submit_tool_outputs.tool_calls;
 
       console.log("Tool calls:", toolCalls);
-      await bot.sendMessage(chatId, `Tool richiesti: ${toolCalls.map(tc => tc.function.name).join(', ')}. Query: ${toolCalls.map(tc => tc.function.arguments).join(', ')}. Sto recuperando le informazioni...`);
+      bot.sendMessage(chatId, `Tool richiesti: ${toolCalls.map(tc => tc.function.name).join(', ')}. Query: ${toolCalls.map(tc => tc.function.arguments).join(', ')}. Sto recuperando le informazioni...`);
 
       /*Tool calls: [
   {
@@ -172,6 +173,9 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
         }*/ else {
           await bot.sendMessage(chatId, responseText);
           console.log(`Risposta testuale inviata a ${chatId}.`);
+          // Aggiungi la coppia domanda-risposta al dataset di fine-tuning
+          addTrainingFile(inputText, responseText);
+
         }
       } else {
         await bot.sendMessage(chatId, "Spiacente, non ho ricevuto una risposta valida.");
