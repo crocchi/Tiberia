@@ -9,37 +9,66 @@
 </head>
 <body>
   <h1>Editor Dataset JSONL</h1>
-  <div id="rows"></div>
+  <div style="display: flex; height: 80vh;">
+    <div id="userList" style="width: 35%; overflow-y: auto; border-right: 1px solid #ccc; padding: 10px;"></div>
+    <div id="editorPane" style="width: 65%; padding: 10px;">
+      <h3>Anteprima/Editor Riga</h3>
+      <textarea id="editorArea" style="width: 100%; height: 300px;"></textarea><br>
+      <button id="saveBtn" style="margin-top: 10px;">Salva Modifica</button>
+    </div>
+  </div>
   <script>
+    let dataset = [];
+    let selectedIndex = null;
     async function loadRows() {
       const res = await fetch('/training/json');
-      const data = await res.json();
-      const container = document.getElementById('rows');
-      container.innerHTML = '';
-      data.forEach((row, i) => {
+      dataset = await res.json();
+      renderUserList();
+      clearEditor();
+    }
+    function renderUserList() {
+      const userList = document.getElementById('userList');
+      userList.innerHTML = '';
+      dataset.forEach((row, i) => {
+        const userMsg = row.messages?.find(m => m.role === 'user');
+        const preview = userMsg ? userMsg.content.slice(0, 60) : '[Nessun messaggio user]';
         const div = document.createElement('div');
-        div.className = 'row';
-        div.innerHTML = `
-          <textarea id="row${i}">${JSON.stringify(row, null, 2)}</textarea>
-          <button onclick="saveRow(${i})">Salva</button>
-        `;
-        container.appendChild(div);
+        div.className = 'user-preview';
+        div.textContent = `${i+1}. ${preview}${userMsg && userMsg.content.length > 60 ? '...' : ''}`;
+        div.style.cursor = 'pointer';
+        div.style.padding = '8px 4px';
+        div.style.borderBottom = '1px solid #eee';
+        if (i === selectedIndex) div.style.background = '#ffe082';
+        div.onclick = () => selectRow(i);
+        userList.appendChild(div);
       });
     }
-    async function saveRow(i) {
-      const val = document.getElementById('row'+i).value;
+    function selectRow(i) {
+      selectedIndex = i;
+      document.getElementById('editorArea').value = JSON.stringify(dataset[i], null, 2);
+      renderUserList();
+    }
+    function clearEditor() {
+      document.getElementById('editorArea').value = '';
+      selectedIndex = null;
+    }
+    document.getElementById('saveBtn').onclick = async function() {
+      if (selectedIndex === null) return alert('Seleziona una riga da modificare!');
+      const val = document.getElementById('editorArea').value;
       try {
         const newRow = JSON.parse(val);
         await fetch('/training/update', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ index: i, newRow })
+          body: JSON.stringify({ index: selectedIndex, newRow })
         });
+        dataset[selectedIndex] = newRow;
         alert('Salvato!');
+        renderUserList();
       } catch (e) {
         alert('Errore JSON!');
       }
-    }
+    };
     loadRows();
   </script>
 </body>
