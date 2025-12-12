@@ -21,7 +21,8 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
   if (userinfo) {
     ({ userFirstName, userUsername } = userinfo);
   }
-  inputText = `[${getDateTime()}] ${inputText}`
+  //let 
+  //inputText = `[${getDateTime()}] ${inputText}`
   // 1. Controlla se l'utente è già "occupato"
   if (busyUsers.has(chatId)) {
     console.log(`Richiesta in attesa per ${chatId} perché una è già in corso.`);
@@ -69,7 +70,7 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
     // 2. Aggiungi il messaggio al thread esistente
     await client.beta.threads.messages.create(threadId, {
       role: "user",
-      content: inputText,
+      content: `[${getDateTime()}] ${inputText}`,
     });
 
     // 3. Esegui l'assistente sul thread
