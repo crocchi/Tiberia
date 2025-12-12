@@ -25,7 +25,7 @@ router.get('/training/json', (req, res) => {
     res.json(data);
 });
 
-router.post('/delete', (req, res) => {
+router.post('/training/delete', (req, res) => {
     const { index } = req.body;
     if (typeof index !== 'number') return res.status(400).json({ error: 'Indice mancante' });
     try {
