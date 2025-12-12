@@ -14,4 +14,22 @@ router.get('/training', (req, res) => {
     res.type('text/plain').send(content);
 });
 
+router.get('/training/json', (req, res) => {
+    if (!fs.existsSync(DATASET_FILE)) {
+        return res.json([]);
+    }
+    const lines = fs.readFileSync(DATASET_FILE, 'utf8').split('\n').filter(Boolean);
+    const data = lines.map(line => JSON.parse(line));
+    res.json(data);
+});
+
+router.post('/training/update', express.json(), (req, res) => {
+    const { index, newRow } = req.body;
+    if (!fs.existsSync(DATASET_FILE)) return res.status(404).send('File non trovato');
+    let lines = fs.readFileSync(DATASET_FILE, 'utf8').split('\n').filter(Boolean);
+    lines[index] = JSON.stringify(newRow);
+    fs.writeFileSync(DATASET_FILE, lines.join('\n') + '\n', 'utf8');
+    res.send('OK');
+});
+
 export default router;

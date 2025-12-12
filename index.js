@@ -38,6 +38,9 @@ app.get('/s', (req, res) => {
   res.render('tiberia');
 });
 
+app.get('/training/editor', (req, res) => {
+  res.render('trainingEditor');
+});
 
 // Avvia il server
 /*
