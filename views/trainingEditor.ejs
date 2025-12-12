@@ -15,6 +15,7 @@
       <h3>Anteprima/Editor Riga</h3>
       <textarea id="editorArea" style="width: 100%; height: 300px;"></textarea><br>
       <button id="saveBtn" style="margin-top: 10px;">Salva Modifica</button>
+      <button id="deleteBtn" style="margin-top: 10px; margin-left: 10px; background: #ff5252; color: white;">Elimina Riga</button>
     </div>
   </div>
   <script>
@@ -68,6 +69,18 @@
       } catch (e) {
         alert('Errore JSON!');
       }
+    };
+    document.getElementById('deleteBtn').onclick = async function() {
+      if (selectedIndex === null) return alert('Seleziona una riga da eliminare!');
+      if (!confirm('Sei sicuro di voler eliminare questa riga?')) return;
+      await fetch('/training/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ index: selectedIndex })
+      });
+      dataset.splice(selectedIndex, 1);
+      clearEditor();
+      renderUserList();
     };
     loadRows();
   </script>
