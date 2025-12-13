@@ -6,7 +6,7 @@ import path from 'path';
 import express from 'express';
 
 const router = express.Router();
-const DATASET_FILE = path.join(process.cwd(), 'info tiberia', 'user_ai_dataset.jsonl');
+const DATASET_FILE = '/cro/user_ai_dataset.jsonl';
 
 router.get('/training', (req, res) => {
     if (!fs.existsSync(DATASET_FILE)) {
