@@ -124,18 +124,18 @@
         container.textContent = 'Nessun messaggio.';
         return;
       }
-      // Mostra user message
-      const userMsg = row.messages.find(m => m.role === 'user');
-      if (userMsg) {
+      // Mostra tutti i messaggi utente
+      const userMsgs = row.messages.filter(m => m.role === 'user');
+      userMsgs.forEach((userMsg, idx) => {
         const div = document.createElement('div');
         div.style.marginBottom = '12px';
         div.style.padding = '8px';
         div.style.border = '1px solid #ddd';
         div.style.borderRadius = '6px';
         div.style.background = '#e3f2fd';
-        div.innerHTML = `<b>Utente</b><br><textarea style='width:98%;min-height:60px;' data-msg-idx='${row.messages.indexOf(userMsg)}'>${userMsg.content.replace(/</g,'&lt;')}</textarea>`;
+        div.innerHTML = `<b>Utente ${userMsgs.length > 1 ? idx+1 : ''}</b><br><textarea style='width:98%;min-height:60px;' data-msg-idx='${row.messages.indexOf(userMsg)}'>${userMsg.content.replace(/</g,'&lt;')}</textarea>`;
         container.appendChild(div);
-      }
+      });
 
       // Mostra tool_calls e risposte tool se presenti
       const toolCallMsg = row.messages.find(m => m.role === 'assistant' && m.tool_calls);
@@ -165,18 +165,18 @@
         });
       }
 
-      // Mostra risposta finale assistant
-      const aiMsg = row.messages.filter(m => m.role === 'assistant' && !m.tool_calls).pop();
-      if (aiMsg) {
+      // Mostra tutte le risposte finali assistant (senza tool_calls)
+      const aiMsgs = row.messages.filter(m => m.role === 'assistant' && !m.tool_calls);
+      aiMsgs.forEach((aiMsg, idx) => {
         const div = document.createElement('div');
         div.style.marginBottom = '12px';
         div.style.padding = '8px';
         div.style.border = '1px solid #388e3c';
         div.style.borderRadius = '6px';
         div.style.background = '#e8f5e9';
-        div.innerHTML = `<b>Risposta AI</b><br><textarea style='width:98%;min-height:250px;' data-msg-idx='${row.messages.indexOf(aiMsg)}'>${aiMsg.content ? aiMsg.content.replace(/</g,'&lt;') : ''}</textarea>`;
+        div.innerHTML = `<b>Risposta AI${aiMsgs.length > 1 ? ' ' + (idx+1) : ''}</b><br><textarea style='width:98%;min-height:250px;' data-msg-idx='${row.messages.indexOf(aiMsg)}'>${aiMsg.content ? aiMsg.content.replace(/</g,'&lt;') : ''}</textarea>`;
         container.appendChild(div);
-      }
+      });
 
 
       // Pulsante salva modifiche inline
