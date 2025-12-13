@@ -1,7 +1,7 @@
 // Script per aggiungere domande/risposte a un file JSONL per fine-tuning OpenAI
 import fs from 'fs';
 import path from 'path';
-import { getFerryTimes_function , searchEvent_function, searchNews_function , getWeather_function, searchWeather_function  } from './info tiberia/fineTunning.js';
+import { getFerryTimes_function , searchEvent_function, searchNews_function , getWeather_function, searchWeather_function  } from './fineTunning.js';
   
 const OUTPUT_FILE = '/cro/user_ai_dataset.jsonl';
 const PROMPT=`Tu sei TIBERIA, una giovane donna caprese di età misteriosa (nessuno sa esattamente quanti anni hai, e se qualcuno insiste rispondi ridendo: «Eh, l’aria di Capri conserva…»).  
