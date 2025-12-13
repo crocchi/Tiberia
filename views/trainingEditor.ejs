@@ -13,9 +13,14 @@
     <div id="userList" style="width: 35%; overflow-y: auto; border-right: 1px solid #ccc; padding: 10px;"></div>
     <div id="editorPane" style="width: 65%; padding: 10px;">
       <h3>Anteprima/Editor Riga</h3>
-      <textarea id="editorArea" style="width: 100%; height: 300px;"></textarea><br>
-      <button id="saveBtn" style="margin-top: 10px;">Salva Modifica</button>
-      <button id="deleteBtn" style="margin-top: 10px; margin-left: 10px; background: #ff5252; color: white;">Elimina Riga</button>
+      <div id="messagesView"></div>
+      <button id="editRawBtn" style="margin-top: 10px;">Modifica JSON grezzo</button>
+      <div id="rawEditor" style="display:none; margin-top:10px;">
+        <textarea id="editorArea" style="width: 100%; height: 300px;"></textarea><br>
+        <button id="saveBtn" style="margin-top: 10px;">Salva Modifica</button>
+        <button id="deleteBtn" style="margin-top: 10px; margin-left: 10px; background: #ff5252; color: white;">Elimina Riga</button>
+        <button id="closeRawBtn" style="margin-top: 10px; margin-left: 10px;">Chiudi JSON</button>
+      </div>
     </div>
   </div>
   <script>
@@ -46,11 +51,33 @@
     }
     function selectRow(i) {
       selectedIndex = i;
-      document.getElementById('editorArea').value = JSON.stringify(dataset[i], null, 2);
       renderUserList();
+      showMessagesView(dataset[i]);
+      document.getElementById('rawEditor').style.display = 'none';
+    }
+
+    function showMessagesView(row) {
+      const container = document.getElementById('messagesView');
+      container.innerHTML = '';
+      if (!row || !Array.isArray(row.messages)) {
+        container.textContent = 'Nessun messaggio.';
+        return;
+      }
+      row.messages.forEach(msg => {
+        const div = document.createElement('div');
+        div.style.marginBottom = '12px';
+        div.style.padding = '8px';
+        div.style.border = '1px solid #ddd';
+        div.style.borderRadius = '6px';
+        div.style.background = msg.role === 'user' ? '#e3f2fd' : '#fffde7';
+        div.innerHTML = `<b>${msg.role}</b><br><span>${msg.content.replace(/</g,'&lt;').replace(/\n/g,'<br>')}</span>`;
+        container.appendChild(div);
+      });
     }
     function clearEditor() {
+      document.getElementById('messagesView').innerHTML = '';
       document.getElementById('editorArea').value = '';
+      document.getElementById('rawEditor').style.display = 'none';
       selectedIndex = null;
     }
     document.getElementById('saveBtn').onclick = async function() {
@@ -65,6 +92,8 @@
         });
         dataset[selectedIndex] = newRow;
         alert('Salvato!');
+        showMessagesView(newRow);
+        document.getElementById('rawEditor').style.display = 'none';
         renderUserList();
       } catch (e) {
         alert('Errore JSON!');
@@ -81,6 +110,15 @@
       dataset.splice(selectedIndex, 1);
       clearEditor();
       renderUserList();
+    };
+
+    document.getElementById('editRawBtn').onclick = function() {
+      if (selectedIndex === null) return alert('Seleziona una riga!');
+      document.getElementById('editorArea').value = JSON.stringify(dataset[selectedIndex], null, 2);
+      document.getElementById('rawEditor').style.display = 'block';
+    };
+    document.getElementById('closeRawBtn').onclick = function() {
+      document.getElementById('rawEditor').style.display = 'none';
     };
     loadRows();
   </script>
