@@ -2,9 +2,70 @@
 <html>
 <head>
   <title>Editor Dataset JSONL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    textarea { width: 90%; height: 60px; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, Arial, sans-serif;
+      background: #fafafa;
+    }
+    textarea {
+      width: 98%;
+      min-height: 60px;
+      font-size: 1.1em;
+      border-radius: 6px;
+      border: 1px solid #bbb;
+      padding: 6px;
+      box-sizing: border-box;
+      resize: vertical;
+    }
     .row { border-bottom: 1px solid #ccc; margin-bottom: 10px; }
+    #userList {
+      width: 35%;
+      min-width: 180px;
+      max-width: 350px;
+      overflow-y: auto;
+      border-right: 1px solid #ccc;
+      padding: 10px;
+      background: #fff;
+    }
+    #editorPane {
+      width: 65%;
+      padding: 10px;
+      min-width: 220px;
+      background: #fafafa;
+    }
+    button {
+      font-size: 1.1em;
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      margin-bottom: 6px;
+    }
+    @media (max-width: 800px) {
+      .row, #userList, #editorPane { font-size: 1em; }
+      #userList { min-width: 120px; }
+      #editorPane { min-width: 120px; }
+    }
+    @media (max-width: 600px) {
+      body > div[style*="display: flex"] {
+        flex-direction: column !important;
+        height: auto !important;
+      }
+      #userList, #editorPane {
+        width: 100% !important;
+        min-width: 0;
+        max-width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #ccc;
+      }
+      #editorPane { border-bottom: none; }
+      h1 { font-size: 1.3em; }
+      button { width: 100%; margin-left: 0 !important; }
+    }
   </style>
 </head>
 <body>
@@ -113,7 +174,7 @@
         div.style.border = '1px solid #388e3c';
         div.style.borderRadius = '6px';
         div.style.background = '#e8f5e9';
-        div.innerHTML = `<b>Risposta AI</b><br><textarea style='width:98%;min-height:120px;' data-msg-idx='${row.messages.indexOf(aiMsg)}'>${aiMsg.content ? aiMsg.content.replace(/</g,'&lt;') : ''}</textarea>`;
+        div.innerHTML = `<b>Risposta AI</b><br><textarea style='width:98%;min-height:250px;' data-msg-idx='${row.messages.indexOf(aiMsg)}'>${aiMsg.content ? aiMsg.content.replace(/</g,'&lt;') : ''}</textarea>`;
         container.appendChild(div);
       }
 
