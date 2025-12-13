@@ -63,17 +63,60 @@
         container.textContent = 'Nessun messaggio.';
         return;
       }
-      row.messages.forEach((msg, idx) => {
+      // Mostra user message
+      const userMsg = row.messages.find(m => m.role === 'user');
+      if (userMsg) {
         const div = document.createElement('div');
         div.style.marginBottom = '12px';
         div.style.padding = '8px';
         div.style.border = '1px solid #ddd';
         div.style.borderRadius = '6px';
-        div.style.background = msg.role === 'user' ? '#e3f2fd' : '#fffde7';
-        let sizeHigh=msg.role === 'assistant' ? 'min-height:300px;' : 'min-height:60px;';
-        div.innerHTML = `<b>${msg.role}</b><br><textarea style='width:98%;${sizeHigh}' data-msg-idx='${idx}'>${msg.content.replace(/</g,'&lt;')}</textarea>`;
+        div.style.background = '#e3f2fd';
+        div.innerHTML = `<b>Utente</b><br><textarea style='width:98%;min-height:60px;' data-msg-idx='${row.messages.indexOf(userMsg)}'>${userMsg.content.replace(/</g,'&lt;')}</textarea>`;
         container.appendChild(div);
-      });
+      }
+
+      // Mostra tool_calls e risposte tool se presenti
+      const toolCallMsg = row.messages.find(m => m.role === 'assistant' && m.tool_calls);
+      if (toolCallMsg && Array.isArray(toolCallMsg.tool_calls)) {
+        toolCallMsg.tool_calls.forEach((tc, i) => {
+          const div = document.createElement('div');
+          div.style.marginBottom = '12px';
+          div.style.padding = '8px';
+          div.style.border = '1px solid #bdbdbd';
+          div.style.borderRadius = '6px';
+          div.style.background = '#fffde7';
+          div.innerHTML = `<b>Funzione:</b> <span style='color:#1565c0;'>${tc.function.name}</span><br><b>Argomenti:</b> <pre style='background:#f5f5f5;border-radius:4px;padding:4px;'>${tc.function.arguments.replace(/</g,'&lt;')}</pre>`;
+          container.appendChild(div);
+
+          // Cerca la risposta del tool
+          const toolResult = row.messages.find(m => m.role === 'tool' && m.tool_call_id === tc.id);
+          if (toolResult) {
+            const divTool = document.createElement('div');
+            divTool.style.marginBottom = '12px';
+            divTool.style.padding = '8px';
+            divTool.style.border = '1px solid #bdbdbd';
+            divTool.style.borderRadius = '6px';
+            divTool.style.background = '#e0f7fa';
+            divTool.innerHTML = `<b>Risposta Tool:</b><br><pre style='background:#f5f5f5;border-radius:4px;padding:4px;'>${toolResult.content.replace(/</g,'&lt;')}</pre>`;
+            container.appendChild(divTool);
+          }
+        });
+      }
+
+      // Mostra risposta finale assistant
+      const aiMsg = row.messages.filter(m => m.role === 'assistant' && !m.tool_calls).pop();
+      if (aiMsg) {
+        const div = document.createElement('div');
+        div.style.marginBottom = '12px';
+        div.style.padding = '8px';
+        div.style.border = '1px solid #388e3c';
+        div.style.borderRadius = '6px';
+        div.style.background = '#e8f5e9';
+        div.innerHTML = `<b>Risposta AI</b><br><textarea style='width:98%;min-height:120px;' data-msg-idx='${row.messages.indexOf(aiMsg)}'>${aiMsg.content ? aiMsg.content.replace(/</g,'&lt;') : ''}</textarea>`;
+        container.appendChild(div);
+      }
+
       // Pulsante salva modifiche inline
       const saveBtn = document.createElement('button');
       saveBtn.textContent = 'Salva Modifiche';
