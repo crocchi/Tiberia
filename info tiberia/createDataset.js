@@ -66,9 +66,8 @@ Esempi:
  * @param {string} aiAnswer - Risposta dell'AI
  * @param {string[]} [tools] - Array opzionale di tool usati
  */
- **
 
-function addTrainingFile(userQuestion, aiAnswer, tools = []) {
+export function addTrainingFile(userQuestion, aiAnswer, tools = []) {
    /* const entry = {
         messages: [
             { role: 'system', content: PROMPT },
@@ -97,6 +96,7 @@ function addTrainingFile(userQuestion, aiAnswer, tools = []) {
             }));
             entry = {
                 messages: [
+                    { role: 'system', content: PROMPT },
                     { role: 'user', content: userQuestion },
                     { role: 'assistant', tool_calls: toolCalls },
                     ...toolResults,
@@ -110,6 +110,7 @@ function addTrainingFile(userQuestion, aiAnswer, tools = []) {
         } else {
             entry = {
                 messages: [
+                    { role: 'system', content: PROMPT },
                     { role: 'user', content: userQuestion },
                     { role: 'assistant', content: aiAnswer }
                 ]
@@ -121,4 +122,3 @@ function addTrainingFile(userQuestion, aiAnswer, tools = []) {
 
 // Esempio di utilizzo:
 // addExample('Qual è la capitale d\'Italia?', 'La capitale d\'Italia è Roma.');
-export { addTrainingFile };
