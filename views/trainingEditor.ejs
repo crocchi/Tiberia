@@ -215,8 +215,14 @@
           // Unisci i messaggi delle due righe
           const merged = JSON.parse(JSON.stringify(dataset[selectedIndex]));
           const next = dataset[selectedIndex + 1];
-          // Unisci gli array messages (puoi personalizzare la logica)
-          merged.messages = merged.messages.concat(next.messages);
+          // Unisci gli array messages, rimuovendo eventuali duplicati 'system' (prompt)
+          const mergedMessages = merged.messages.concat(
+            next.messages.filter(m => m.role !== 'system')
+          );
+          // Se ci sono più di un 'system', tieni solo il primo
+          let firstSystem = mergedMessages.find(m => m.role === 'system');
+          let rest = mergedMessages.filter((m, idx) => m.role !== 'system' || idx === mergedMessages.indexOf(firstSystem));
+          merged.messages = rest;
           // Unisci tools se presenti
           if (merged.tools && next.tools) {
             merged.tools = merged.tools.concat(next.tools);
