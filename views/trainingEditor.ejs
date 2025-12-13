@@ -147,7 +147,7 @@
           div.style.border = '1px solid #bdbdbd';
           div.style.borderRadius = '6px';
           div.style.background = '#fffde7';
-          div.innerHTML = `<b>Funzione:</b> <span style='color:#1565c0;'>${tc.function.name}</span><br><b>Argomenti:</b> <pre style='background:#f5f5f5;border-radius:4px;padding:4px;'>${tc.function.arguments.replace(/</g,'&lt;')}</pre>`;
+          div.innerHTML = `<b>Funzione:</b> <span style='color:#1565c0;'>${tc.function.name}</span><br><b>Argomenti:</b> <pre style='background:#f5f5f5;white-space:unset;border-radius:4px;padding:4px;'>${tc.function.arguments.replace(/</g,'&lt;')}</pre>`;
           container.appendChild(div);
 
           // Cerca la risposta del tool
