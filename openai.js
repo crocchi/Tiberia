@@ -175,7 +175,7 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
           await bot.sendMessage(chatId, responseText);
           console.log(`Risposta testuale inviata a ${chatId}.`);
           // Aggiungi la coppia domanda-risposta al dataset di fine-tuning
-          addTrainingFile(inputText, responseText);
+          addTrainingFile(inputText, responseText, run.required_action.submit_tool_outputs.tool_calls);
 
         }
       } else {

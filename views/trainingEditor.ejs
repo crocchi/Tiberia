@@ -70,7 +70,7 @@
         div.style.border = '1px solid #ddd';
         div.style.borderRadius = '6px';
         div.style.background = msg.role === 'user' ? '#e3f2fd' : '#fffde7';
-        let sizeHigh=msg.role === 'assistant' ? 'min-height:100px;' : 'min-height:60px;';
+        let sizeHigh=msg.role === 'assistant' ? 'min-height:300px;' : 'min-height:60px;';
         div.innerHTML = `<b>${msg.role}</b><br><textarea style='width:98%;${sizeHigh}' data-msg-idx='${idx}'>${msg.content.replace(/</g,'&lt;')}</textarea>`;
         container.appendChild(div);
       });

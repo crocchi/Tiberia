@@ -1,7 +1,7 @@
 // Script per aggiungere domande/risposte a un file JSONL per fine-tuning OpenAI
 import fs from 'fs';
 import path from 'path';
-
+  
 const OUTPUT_FILE = '/cro/user_ai_dataset.jsonl';
 const PROMPT=`Tu sei TIBERIA, una giovane donna caprese di età misteriosa (nessuno sa esattamente quanti anni hai, e se qualcuno insiste rispondi ridendo: «Eh, l’aria di Capri conserva…»).  
 Dicono che tu discenda in qualche modo dall’imperatore Tiberio, e che la tua famiglia abbia sempre vissuto lassù, tra Villa Jovis e il Salto di Tiberio. Hai gli occhi color mare di gennaio e un sorriso che nasconde mille segreti dell’isola.
@@ -64,18 +64,61 @@ Esempi:
  * Aggiunge una domanda e risposta al file JSONL
  * @param {string} userQuestion - Domanda dell'utente
  * @param {string} aiAnswer - Risposta dell'AI
+ * @param {string[]} [tools] - Array opzionale di tool usati
  */
-export function addTrainingFile(userQuestion, aiAnswer) {
-    const entry = {
+ **
+
+function addTrainingFile(userQuestion, aiAnswer, tools = []) {
+   /* const entry = {
         messages: [
             { role: 'system', content: PROMPT },
             { role: 'user', content: userQuestion },
             { role: 'assistant', content: aiAnswer }
-        ]
-    };
-    fs.appendFileSync(OUTPUT_FILE, JSON.stringify(entry) + '\n', 'utf8');
-    console.log('Esempio aggiunto:', entry);
-}
+        ],
+        tools: Array.isArray(tools) ? tools : []
+    };*/
+        let entry;
+        if (Array.isArray(tools) && tools.length > 0) {
+            // Struttura avanzata stile templateMsg
+            // Esempio: tools = [{name: 'get_current_weather', args: {location: 'Capri', format: 'celsius'}, result: {temperature: 20, condition: 'soleggiato'}}]
+            const toolCalls = tools.map((t, i) => ({
+                id: `call_${String(i+1).padStart(3,'0')}`,
+                type: 'function',
+                function: {
+                    name: t.name,
+                    arguments: JSON.stringify(t.args || {})
+                }
+            }));
+            const toolResults = tools.map((t, i) => ({
+                role: 'tool',
+                tool_call_id: `call_${String(i+1).padStart(3,'0')}`,
+                name: t.name,
+                content: JSON.stringify(t.result || {})
+            }));
+            entry = {
+                messages: [
+                    { role: 'user', content: userQuestion },
+                    { role: 'assistant', tool_calls: toolCalls },
+                    ...toolResults,
+                    { role: 'assistant', content: aiAnswer }
+                ],
+                tools: tools.map(t => ({
+                    type: 'function',
+                    function: { name: t.name, description: t.description || '', parameters: t.parameters || {} }
+                }))
+            };
+        } else {
+            entry = {
+                messages: [
+                    { role: 'user', content: userQuestion },
+                    { role: 'assistant', content: aiAnswer }
+                ]
+            };
+        }
+        fs.appendFileSync(OUTPUT_FILE, JSON.stringify(entry) + '\n', 'utf8');
+        console.log('Esempio aggiunto:', entry);
+    }
 
 // Esempio di utilizzo:
 // addExample('Qual è la capitale d\'Italia?', 'La capitale d\'Italia è Roma.');
+export { addTrainingFile };
