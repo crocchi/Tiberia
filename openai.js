@@ -79,53 +79,25 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
     });
 
     // CICLO DI GESTIONE RUN
-    while (['queued', 'in_progress', 'cancelling'].includes(run.status)) {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      run = await client.beta.threads.runs.retrieve(threadId, run.id);
-    }
-    
-    // GESTISCI LA RICHIESTA DI ESEGUIRE UN TOOL
-    if (run.status === 'requires_action') {
-      const toolCalls = run.required_action.submit_tool_outputs.tool_calls;
-
-      console.log("Tool calls:", toolCalls);
-      bot.sendMessage(chatId, `Tool richiesti: ${toolCalls.map(tc => tc.function.name).join(', ')}. Query: ${toolCalls.map(tc => tc.function.arguments).join(', ')}. Sto recuperando le informazioni...`);
-
-      /*Tool calls: [
-  {
-    id: 'call_sotiSiiuw6WOM0M0gfYgkiNc',
-    type: 'function',
-    function: {
-      name: 'searchNews',
-      arguments: '{"queryText":"news Capri 8 dicembre 2025"}'
-    }
-  }
-] */
-      //gestisci tutte le chiamate ai tool
-      const toolOutputs = await handleToolCalls(toolCalls);
-
-      console.log("Tool outputs ottenuti:", toolOutputs);
-
-      // Invia i risultati del tool all'assistente
-      run = await client.beta.threads.runs.submitToolOutputs(threadId, run.id, {
-        tool_outputs: toolOutputs,
-      });
-
-      // Gestione ciclica di run.status
-      while (true) {
-        if (['queued', 'in_progress', 'cancelling'].includes(run.status)) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          run = await client.beta.threads.runs.retrieve(threadId, run.id);
-        } else if (run.status === 'requires_action') {
-          const toolCalls = run.required_action.submit_tool_outputs.tool_calls;
-          const toolOutputs = await handleToolCalls(toolCalls);
-
-          run = await client.beta.threads.runs.submitToolOutputs(threadId, run.id, {
-            tool_outputs: toolOutputs,
-          });
-        } else {
-          break;
-        }
+    let lastToolCalls = null;
+    let lastToolOutputs = null;
+    while (['queued', 'in_progress', 'cancelling', 'requires_action'].includes(run.status)) {
+      if (run.status === 'requires_action') {
+        const toolCalls = run.required_action.submit_tool_outputs.tool_calls;
+        lastToolCalls = toolCalls;
+        console.log("Tool calls:", toolCalls);
+        bot.sendMessage(chatId, `Tool richiesti: ${toolCalls.map(tc => tc.function.name).join(', ')}. Query: ${toolCalls.map(tc => tc.function.arguments).join(', ')}. Sto recuperando le informazioni...`);
+        const toolOutputs = await handleToolCalls(toolCalls);
+        lastToolOutputs = toolOutputs;
+        console.log("Tool outputs ottenuti:", toolOutputs);
+        run = await client.beta.threads.runs.submitToolOutputs(threadId, run.id, {
+          tool_outputs: toolOutputs,
+        });
+      } else if (['queued', 'in_progress', 'cancelling'].includes(run.status)) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        run = await client.beta.threads.runs.retrieve(threadId, run.id);
+      } else {
+        break;
       }
     }
 
@@ -174,8 +146,19 @@ export async function processAssistantRequest(chatId, inputText, responseType = 
         }*/ else {
           await bot.sendMessage(chatId, responseText);
           console.log(`Risposta testuale inviata a ${chatId}.`);
-          // Aggiungi la coppia domanda-risposta al dataset di fine-tuning
-          addTrainingFile(inputText, responseText, run.required_action.submit_tool_outputs.tool_calls);
+          // Prepara la struttura tools per il dataset
+          let toolsForDataset = [];
+          if (lastToolCalls && lastToolOutputs) {
+            toolsForDataset = lastToolCalls.map(tc => {
+              const outputObj = lastToolOutputs.find(o => o.tool_call_id === tc.id);
+              return {
+                name: tc.function.name,
+                args: JSON.parse(tc.function.arguments),
+                result: outputObj ? outputObj.output : undefined
+              };
+            });
+          }
+          addTrainingFile(inputText, responseText, toolsForDataset);
 
         }
       } else {
