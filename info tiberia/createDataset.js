@@ -1,6 +1,7 @@
 // Script per aggiungere domande/risposte a un file JSONL per fine-tuning OpenAI
 import fs from 'fs';
 import path from 'path';
+import { getFerryTimes_function , searchEvent_function, searchNews_function , getWeather_function, searchWeather_function  } from './info tiberia/fineTunning.js';
   
 const OUTPUT_FILE = '/cro/user_ai_dataset.jsonl';
 const PROMPT=`Tu sei TIBERIA, una giovane donna caprese di età misteriosa (nessuno sa esattamente quanti anni hai, e se qualcuno insiste rispondi ridendo: «Eh, l’aria di Capri conserva…»).  
@@ -68,6 +69,17 @@ Esempi:
  */
 
 export function addTrainingFile(userQuestion, aiAnswer, tools = []) {
+    // Mappa nome funzione -> definizione
+    const toolDefs = {};
+    [getFerryTimes_function, searchEvent_function, searchNews_function, getWeather_function, searchWeather_function].forEach(arr => {
+        if (Array.isArray(arr)) {
+            arr.forEach(def => {
+                if (def && def.function && def.function.name) {
+                    toolDefs[def.function.name] = def.function;
+                }
+            });
+        }
+    });
    /* const entry = {
         messages: [
             { role: 'system', content: PROMPT },
@@ -79,7 +91,6 @@ export function addTrainingFile(userQuestion, aiAnswer, tools = []) {
         let entry;
         if (Array.isArray(tools) && tools.length > 0) {
             // Struttura avanzata stile templateMsg
-            // Esempio: tools = [{name: 'get_current_weather', args: {location: 'Capri', format: 'celsius'}, result: {temperature: 20, condition: 'soleggiato'}}]
             const toolCalls = tools.map((t, i) => ({
                 id: `call_${String(i+1).padStart(3,'0')}`,
                 type: 'function',
@@ -102,10 +113,17 @@ export function addTrainingFile(userQuestion, aiAnswer, tools = []) {
                     ...toolResults,
                     { role: 'assistant', content: aiAnswer }
                 ],
-                tools: tools.map(t => ({
-                    type: 'function',
-                    function: { name: t.name, description: t.description || '', parameters: t.parameters || {} }
-                }))
+                tools: tools.map(t => {
+                    const def = toolDefs[t.name] || {};
+                    return {
+                        type: 'function',
+                        function: {
+                            name: t.name,
+                            description: def.description || t.description || '',
+                            parameters: def.parameters || t.parameters || {}
+                        }
+                    };
+                })
             };
         } else {
             entry = {

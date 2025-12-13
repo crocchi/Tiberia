@@ -241,3 +241,5 @@ REGOLE ANTI-ERRORE PER EVENTI E DATE (OBBLIGATORIE, SEMPRE):
 - Obiettivo: zero allucinazioni. Meglio dire "non lo so al 100%" che sbagliare e perdere fiducia.
 `;
 
+
+export{ getFerryTimes_function, searchNews_function, getWeather_function, searchWeather_function, searchEvent_function}
