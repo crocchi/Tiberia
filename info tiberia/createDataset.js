@@ -135,7 +135,7 @@ export function addTrainingFile(userQuestion, aiAnswer, tools = []) {
             };
         }
         fs.appendFileSync(OUTPUT_FILE, JSON.stringify(entry) + '\n', 'utf8');
-        console.log('Esempio aggiunto:', entry);
+       // console.log('Esempio aggiunto:', entry);
     }
 
 // Esempio di utilizzo:
