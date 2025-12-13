@@ -2,7 +2,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const OUTPUT_FILE = path.join(process.cwd(), 'info tiberia', 'user_ai_dataset.jsonl');
+const OUTPUT_FILE = '/cro/user_ai_dataset.jsonl';
 
 /**
  * Aggiunge una domanda e risposta al file JSONL
