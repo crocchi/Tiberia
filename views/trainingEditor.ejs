@@ -63,16 +63,38 @@
         container.textContent = 'Nessun messaggio.';
         return;
       }
-      row.messages.forEach(msg => {
+      row.messages.forEach((msg, idx) => {
         const div = document.createElement('div');
         div.style.marginBottom = '12px';
         div.style.padding = '8px';
         div.style.border = '1px solid #ddd';
         div.style.borderRadius = '6px';
         div.style.background = msg.role === 'user' ? '#e3f2fd' : '#fffde7';
-        div.innerHTML = `<b>${msg.role}</b><br><span>${msg.content.replace(/</g,'&lt;').replace(/\n/g,'<br>')}</span>`;
+        div.innerHTML = `<b>${msg.role}</b><br><textarea style='width:98%;min-height:40px;' data-msg-idx='${idx}'>${msg.content.replace(/</g,'&lt;')}</textarea>`;
         container.appendChild(div);
       });
+      // Pulsante salva modifiche inline
+      const saveBtn = document.createElement('button');
+      saveBtn.textContent = 'Salva Modifiche';
+      saveBtn.style.marginTop = '10px';
+      saveBtn.onclick = async function() {
+        if (selectedIndex === null) return;
+        // Aggiorna i content dei messaggi
+        const textareas = container.querySelectorAll('textarea[data-msg-idx]');
+        textareas.forEach(ta => {
+          const idx = parseInt(ta.getAttribute('data-msg-idx'));
+          dataset[selectedIndex].messages[idx].content = ta.value;
+        });
+        // Salva lato server
+        await fetch('/training/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ index: selectedIndex, newRow: dataset[selectedIndex] })
+        });
+        alert('Modifiche salvate!');
+        renderUserList();
+      };
+      container.appendChild(saveBtn);
     }
     function clearEditor() {
       document.getElementById('messagesView').innerHTML = '';
