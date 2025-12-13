@@ -178,6 +178,7 @@
         container.appendChild(div);
       }
 
+
       // Pulsante salva modifiche inline
       const saveBtn = document.createElement('button');
       saveBtn.textContent = 'Salva Modifiche';
@@ -200,6 +201,46 @@
         renderUserList();
       };
       container.appendChild(saveBtn);
+
+      // Pulsante unisci con riga successiva
+      if (selectedIndex !== null && selectedIndex < dataset.length - 1) {
+        const mergeBtn = document.createElement('button');
+        mergeBtn.textContent = 'Unisci con Riga Successiva';
+        mergeBtn.style.marginTop = '10px';
+        mergeBtn.style.marginLeft = '10px';
+        mergeBtn.style.background = '#1976d2';
+        mergeBtn.style.color = 'white';
+        mergeBtn.onclick = async function() {
+          if (!confirm('Vuoi davvero unire questa riga con la successiva?')) return;
+          // Unisci i messaggi delle due righe
+          const merged = JSON.parse(JSON.stringify(dataset[selectedIndex]));
+          const next = dataset[selectedIndex + 1];
+          // Unisci gli array messages (puoi personalizzare la logica)
+          merged.messages = merged.messages.concat(next.messages);
+          // Unisci tools se presenti
+          if (merged.tools && next.tools) {
+            merged.tools = merged.tools.concat(next.tools);
+          }
+          // Aggiorna lato server: elimina la successiva, aggiorna la corrente
+          await fetch('/training/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ index: selectedIndex, newRow: merged })
+          });
+          await fetch('/training/delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ index: selectedIndex + 1 })
+          });
+          // Aggiorna dataset locale
+          dataset[selectedIndex] = merged;
+          dataset.splice(selectedIndex + 1, 1);
+          alert('Righe unite!');
+          clearEditor();
+          renderUserList();
+        };
+        container.appendChild(mergeBtn);
+      }
 
       // Pulsante elimina riga
       const deleteBtn = document.createElement('button');
